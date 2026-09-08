@@ -174,6 +174,14 @@ header .spacer { flex: 1; }
   color: var(--text); margin-bottom: 6px;
 }
 .session-hero p { font-size: 15px; color: var(--text2); max-width: 600px; }
+.run-all-btn {
+  margin-left: auto; align-self: center; flex-shrink: 0;
+  padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer;
+  background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 600;
+  font-family: inherit; transition: filter .15s;
+}
+.run-all-btn:hover { filter: brightness(1.12); }
+.run-all-btn:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── Lesson ── */
 .lesson { margin-bottom: 56px; }
@@ -266,8 +274,13 @@ header .spacer { flex: 1; }
   background: transparent; color: var(--code-text);
   font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.65;
   padding: 14px 16px; border: none; outline: none; resize: vertical;
-  tab-size: 4;
+  tab-size: 4; box-sizing: border-box;
+  /* Custom resize handle area at bottom */
+  border-bottom: 3px solid transparent;
+  transition: border-color .15s;
 }
+.code-input:hover { border-bottom-color: var(--border); }
+.code-input:focus { border-bottom-color: var(--accent); }
 .cell-output {
   border-top: 1px solid var(--code-border);
   background: var(--code-bg); padding: 0;
@@ -1555,6 +1568,79 @@ df_reload.info()</textarea>
     </div>
   </div>
 
+  <!-- ── Buy & Hold ── -->
+  <div class="lesson" id="s2a-buyhold">
+    <h2>📈 Buy &amp; Hold Returns</h2>
+    <div class="concept-box">
+      <p>The simplest investment strategy is <strong>buy &amp; hold</strong>: buy a stock on a given date, hold it, and sell later. Your return is:</p>
+      <pre style="background:var(--bg3);padding:10px 14px;border-radius:6px;font-size:13px;margin-top:8px;">return = (sell_price − buy_price) / buy_price × 100</pre>
+      <p style="margin-top:10px;">This section uses the cleaned 2026 DataFrame (<code>df</code>) you built in the previous exercises. Make sure you've run the cleaning cells above before starting.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Buy &amp; Hold</span>
+        <h3>Part 1 — Quarterly returns</h3>
+      </div>
+      <p class="exercise-desc">Imagine you had bought AAPL at the <strong>start of 2026</strong> (first available trading day). What would your return have been if you sold at the <strong>end of March</strong>? And at the <strong>end of April</strong>? Print both results clearly.</p>
+      <div class="cell" id="cell-s2-bh1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-bh1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-bh1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# df is your cleaned 2026 DataFrame with a DatetimeIndex
+# Tip: you can filter by date string, e.g. df.loc['2026-01']
+
+buy_price = ...   # first Close of the year
+
+# End of March
+sell_march = ...
+return_march = ...
+
+# End of April
+sell_april = ...
+return_april = ...
+
+print(f'Buy price (Jan 2026):    ${buy_price:.2f}')
+print(f'Sell end-of-March:       ${sell_march:.2f}  →  Return: {return_march:.2f}%')
+print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.2f}%')"># df is your cleaned 2026 DataFrame with a DatetimeIndex
+# Tip: you can filter by date string, e.g. df.loc['2026-01']
+
+buy_price = ...   # first Close of the year
+
+# End of March
+sell_march = ...
+return_march = ...
+
+# End of April
+sell_april = ...
+return_april = ...
+
+print(f'Buy price (Jan 2026):    ${buy_price:.2f}')
+print(f'Sell end-of-March:       ${sell_march:.2f}  →  Return: {return_march:.2f}%')
+print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.2f}%')</textarea>
+        <div class="cell-output" id="output-cell-s2-bh1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>buy_price = df.loc['2026-01']['Close'].iloc[0]
+
+sell_march = df.loc['2026-03']['Close'].iloc[-1]
+return_march = (sell_march - buy_price) / buy_price * 100
+
+sell_april = df.loc['2026-04']['Close'].iloc[-1]
+return_april = (sell_april - buy_price) / buy_price * 100
+
+print(f'Buy price (Jan 2026):    ${buy_price:.2f}')
+print(f'Sell end-of-March:       ${sell_march:.2f}  →  Return: {return_march:.2f}%')
+print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.2f}%')</pre></div>
+      </details>
+    </div>
+  </div>
+
 </div><!-- /sec-s2a -->
 
 </main>
@@ -1763,6 +1849,7 @@ async function initPyodide() {
     document.getElementById('status-dot').classList.add('ready');
     setStatus('Python ready');
     document.querySelectorAll('.run-btn').forEach(b => b.disabled = false);
+    document.querySelectorAll('.run-all-btn').forEach(b => b.disabled = false);
 
   } catch(e) {
     console.error('Pyodide init failed:', e);
@@ -2036,24 +2123,115 @@ function setActiveCell(textarea) {
   }
 }
 
-// Tab = 4 spaces
+// ── Keyboard shortcuts ───────────────────────────────
+const BRACKET_PAIRS = { '(': ')', '[': ']', '{': '}' };
+const QUOTE_CHARS   = new Set(['"', "'"]);
+const CLOSERS       = new Set([')', ']', '}', '"', "'"]);
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Tab' && document.activeElement.classList.contains('code-input')) {
+  const ta = document.activeElement;
+  const isCell = ta && ta.classList.contains('code-input');
+
+  // Tab → 4 spaces
+  if (e.key === 'Tab' && isCell) {
     e.preventDefault();
-    const ta = document.activeElement;
     const s = ta.selectionStart, en = ta.selectionEnd;
-    ta.value = ta.value.substring(0,s) + '    ' + ta.value.substring(en);
+    ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(en);
     ta.selectionStart = ta.selectionEnd = s + 4;
+    return;
   }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && document.activeElement.classList.contains('code-input')) {
+
+  // Shift+Enter or Ctrl/Cmd+Enter → run cell
+  if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey) && isCell) {
     e.preventDefault();
-    const cell = document.activeElement.closest('.cell');
+    const cell = ta.closest('.cell');
     if (cell) runCell(cell.id);
+    return;
   }
+
+  if (!isCell) return;
+
+  const s  = ta.selectionStart;
+  const en = ta.selectionEnd;
+  const nextChar = ta.value[en];
+  const hasSelection = s !== en;
+
+  // Auto-close brackets: ( [ {
+  if (BRACKET_PAIRS[e.key] !== undefined) {
+    const close = BRACKET_PAIRS[e.key];
+    e.preventDefault();
+    if (hasSelection) {
+      // Wrap selection in brackets
+      const selected = ta.value.substring(s, en);
+      ta.value = ta.value.substring(0, s) + e.key + selected + close + ta.value.substring(en);
+      ta.selectionStart = s + 1; ta.selectionEnd = en + 1;
+    } else if (!nextChar || /[\s,)\]};]/.test(nextChar)) {
+      // Insert pair and place cursor inside
+      ta.value = ta.value.substring(0, s) + e.key + close + ta.value.substring(en);
+      ta.selectionStart = ta.selectionEnd = s + 1;
+    } else {
+      // Just insert the opener — something meaningful is right after
+      ta.value = ta.value.substring(0, s) + e.key + ta.value.substring(en);
+      ta.selectionStart = ta.selectionEnd = s + 1;
+    }
+    return;
+  }
+
+  // Skip over matching closer: ) ] }
+  if (CLOSERS.has(e.key) && !QUOTE_CHARS.has(e.key) && nextChar === e.key) {
+    e.preventDefault();
+    ta.selectionStart = ta.selectionEnd = s + 1;
+    return;
+  }
+
+  // Auto-close quotes: " '
+  if (QUOTE_CHARS.has(e.key)) {
+    // Skip over existing matching quote
+    if (nextChar === e.key && !hasSelection) {
+      e.preventDefault();
+      ta.selectionStart = ta.selectionEnd = s + 1;
+      return;
+    }
+    const prevChar = ta.value[s - 1];
+    // Insert pair only when: no selection, next char is whitespace/end/bracket, prev char is not alphanumeric
+    if (!hasSelection && (!nextChar || /[\s,)\]};]/.test(nextChar)) && (!prevChar || /[\s(,\[{=]/.test(prevChar))) {
+      e.preventDefault();
+      ta.value = ta.value.substring(0, s) + e.key + e.key + ta.value.substring(en);
+      ta.selectionStart = ta.selectionEnd = s + 1;
+    }
+    return;
+  }
+});
+
+// ── Run All ─────────────────────────────────────────
+async function runAllInSection(sectionId, btn) {
+  if (!pyodide) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Running…';
+  const sec = document.getElementById(sectionId);
+  const cells = sec.querySelectorAll('.cell');
+  for (const cell of cells) {
+    await runCell(cell.id);
+  }
+  btn.disabled = false;
+  btn.textContent = '▶ Run All';
+}
+
+// Inject Run All button into each session hero
+document.querySelectorAll('.page-section').forEach(sec => {
+  const hero = sec.querySelector('.session-hero');
+  if (!hero) return;
+  const btn = document.createElement('button');
+  btn.className = 'run-all-btn';
+  btn.textContent = '▶ Run All';
+  btn.disabled = true; // enabled when Pyodide is ready
+  btn.onclick = () => runAllInSection(sec.id, btn);
+  hero.appendChild(btn);
 });
 
 // Disable run buttons until ready
 document.querySelectorAll('.run-btn').forEach(b => b.disabled = true);
+document.querySelectorAll('.run-all-btn').forEach(b => b.disabled = true);
 
 // ══════════════════════════════════════════════════════
 //  Navigation
