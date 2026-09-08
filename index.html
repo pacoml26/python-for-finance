@@ -239,13 +239,15 @@ header .spacer { flex: 1; }
 
 /* ── Code Cell ── */
 .cell {
-  border: 1px solid var(--code-border); border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--code-border); border-radius: 10px;
   background: var(--code-bg); margin-bottom: 8px;
+  /* no overflow:hidden — lets the textarea resize handle show at bottom-right corner */
 }
 .cell-toolbar {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 12px; border-bottom: 1px solid var(--code-border);
   background: rgba(255,255,255,.03);
+  border-radius: 10px 10px 0 0; /* clip toolbar's own top corners */
 }
 .cell-num {
   font-family: 'JetBrains Mono', monospace; font-size: 11px;
@@ -640,10 +642,10 @@ df</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>import pandas as pd
+        <div class="solution-body"><pre>import pandas as pd              # bring in the pandas library, giving it the nickname 'pd'
 
-df = pd.read_csv('data/AAPL_2025.csv')
-df</pre></div>
+df = pd.read_csv('data/AAPL_2025.csv')  # read the CSV file and turn it into a DataFrame; store it in the variable 'df'
+df                               # last line outputs automatically — displays the full table</pre></div>
       </details>
     </div>
 
@@ -670,8 +672,8 @@ df_small</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df_small = pd.read_csv('data/AAPL_2025.csv', usecols=['Date', 'Close'])
-df_small</pre></div>
+        <div class="solution-body"><pre>df_small = pd.read_csv('data/AAPL_2025.csv', usecols=['Date', 'Close'])  # usecols tells pandas to only load those two columns — the rest are ignored
+df_small                         # display the two-column table</pre></div>
       </details>
     </div>
   </div>
@@ -716,9 +718,9 @@ df_small</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df.info()
+        <div class="solution-body"><pre>df.info()   # prints each column's name, data type, and how many non-null (non-missing) values it has
 # then in another cell:
-df.shape</pre></div>
+df.shape    # returns (rows, columns) as a tuple — tells you the size of the table at a glance</pre></div>
       </details>
     </div>
 
@@ -743,7 +745,9 @@ df.shape</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>(df['Volume'] > 100_000_000).sum()</pre></div>
+        <div class="solution-body"><pre>(df['Volume'] > 100_000_000).sum()
+# df['Volume'] > 100_000_000  → creates a True/False series (True = that day exceeded 100M)
+# .sum()                       → counts the Trues (True = 1, False = 0)</pre></div>
       </details>
     </div>
   </div>
@@ -778,7 +782,10 @@ display(df.head(...)[['Date', '...', '...']])</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>display(df.head(8)[['Date', 'Close', 'Volume']])</pre></div>
+        <div class="solution-body"><pre>display(df.head(8)[['Date', 'Close', 'Volume']])
+# df.head(8)             → first 8 rows of the full table
+# [['Date','Close','Volume']]  → select only those three columns (double brackets = list of column names)
+# display()              → forces the table to print even when it's not the last line</pre></div>
       </details>
     </div>
 
@@ -801,7 +808,9 @@ display(df.head(...)[['Date', '...', '...']])</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>display(df.tail(5)[['Date', 'Open', 'High', 'Low']])</pre></div>
+        <div class="solution-body"><pre>display(df.tail(5)[['Date', 'Open', 'High', 'Low']])
+# df.tail(5)            → last 5 rows (most recent trading days)
+# same column selection and display() pattern as head()</pre></div>
       </details>
     </div>
   </div>
@@ -836,8 +845,8 @@ df[mask]</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>mask = df['Date'] >= '2025-12-01'
-df[mask]</pre></div>
+        <div class="solution-body"><pre>mask = df['Date'] >= '2025-12-01'  # True for every row where Date is December 1st or later
+df[mask]                           # pass the mask into df[...] to keep only the True rows</pre></div>
       </details>
     </div>
 
@@ -861,7 +870,8 @@ df[mask]</pre></div>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>mask = (df['Date'] >= '2025-01-01') & (df['Date'] <= '2025-01-31')
-df[mask]</pre></div>
+# & means AND — both conditions must be True; each condition needs its own parentheses
+df[mask]  # returns only January rows</pre></div>
       </details>
     </div>
 
@@ -884,8 +894,8 @@ df[mask]</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>mask = df['Volume'] > 150_000_000
-df[mask]</pre></div>
+        <div class="solution-body"><pre>mask = df['Volume'] > 150_000_000  # underscores in numbers are just for readability — same as 150000000
+df[mask]                           # filter to only high-volume days</pre></div>
       </details>
     </div>
 
@@ -908,8 +918,8 @@ df[mask]</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>mask = (df['Close'] > 240) & (df['Volume'] > 80_000_000)
-df[mask]</pre></div>
+        <div class="solution-body"><pre>mask = (df['Close'] > 240) & (df['Volume'] > 80_000_000)  # BOTH conditions must be True — the row needs high price AND high volume
+df[mask]  # days where Close > 240 and Volume > 80M simultaneously</pre></div>
       </details>
     </div>
   </div>
@@ -950,9 +960,9 @@ df</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df['Date'] = pd.to_datetime(df['Date'])
-df = df.set_index('Date')
-df</pre></div>
+        <div class="solution-body"><pre>df['Date'] = pd.to_datetime(df['Date'])  # convert the Date column from plain text → proper datetime objects pandas can sort/slice
+df = df.set_index('Date')                 # promote Date from a column to the row index — now df.loc['2025-01'] works
+df                                        # display: the index is now dates instead of 0, 1, 2, 3...</pre></div>
       </details>
     </div>
 
@@ -977,7 +987,9 @@ df.loc[...:...]</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df.loc['2025-04':'2025-06']</pre></div>
+        <div class="solution-body"><pre>df.loc['2025-04':'2025-06']
+# .loc[start:end] with datetime index: colon means "from ... to ..."
+# partial date strings like '2025-04' match all rows in April 2025 — pandas handles the range automatically</pre></div>
       </details>
     </div>
   </div>
@@ -1027,9 +1039,11 @@ print(f'Q4 above-average days: {q4}')</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>mask = df['Close'] > df['Close'].mean()
+        <div class="solution-body"><pre>mask = df['Close'] > df['Close'].mean()  # True for days where Close beats the full-year average
 q3 = mask[mask.index.to_period('Q') == '2025Q3'].sum()
-q4 = mask[mask.index.to_period('Q') == '2025Q4'].sum()
+# mask.index.to_period('Q') converts each date to its quarter label ('2025Q3', '2025Q4', etc.)
+# == '2025Q3' filters to only Q3 dates; .sum() then counts the Trues in that subset
+q4 = mask[mask.index.to_period('Q') == '2025Q4'].sum()  # same for Q4
 print(f'Q3 above-average days: {q3}')
 print(f'Q4 above-average days: {q4}')</pre></div>
       </details>
@@ -1055,8 +1069,13 @@ print(f'Q4 above-average days: {q4}')</pre></div>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>monthly_avg = df.groupby(df.index.month)['Close'].mean()
+# groupby(df.index.month) → split rows into groups by month number (1=Jan, 12=Dec)
+# ['Close'].mean()        → for each group, compute the average Close price
+# result: a Series with month numbers as index and average prices as values
 print(monthly_avg)
-print(f'\nBest month: {monthly_avg.idxmax()} (avg: ${monthly_avg.max():.2f})')</pre></div>
+print(f'\nBest month: {monthly_avg.idxmax()} (avg: ${monthly_avg.max():.2f})')
+# idxmax() → returns the index label (month number) where the value is highest
+# monthly_avg.max() → the actual highest average price (not the month number)</pre></div>
       </details>
     </div>
 
@@ -1079,10 +1098,15 @@ print(f'\nBest month: {monthly_avg.idxmax()} (avg: ${monthly_avg.max():.2f})')</
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>march = df.loc['2025-03']
+        <div class="solution-body"><pre>march = df.loc['2025-03']                      # slice all rows in March 2025 into a new variable for reuse
 print(f"First open:    ${march['Open'].iloc[0]:.2f}")
+# iloc[0]  → first row by position (earliest trading day in March)
+# :.2f     → format as float with exactly 2 decimal places
 print(f"Last close:    ${march['Close'].iloc[-1]:.2f}")
-print(f"Total volume:  {march['Volume'].sum():,.0f}")</pre></div>
+# iloc[-1] → last row by position (latest trading day); negative index counts from the end
+print(f"Total volume:  {march['Volume'].sum():,.0f}")
+# .sum()   → adds up all Volume values in March
+# :,.0f    → add thousands commas, zero decimal places</pre></div>
       </details>
     </div>
 
@@ -1105,11 +1129,12 @@ print(f"Total volume:  {march['Volume'].sum():,.0f}")</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>jan_vol = df.loc['2025-01']['Volume'].mean()
-dec_vol = df.loc['2025-12']['Volume'].mean()
-print(f'Jan avg volume: {jan_vol:,.0f}')
+        <div class="solution-body"><pre>jan_vol = df.loc['2025-01']['Volume'].mean()  # slice January → take Volume column → compute average
+dec_vol = df.loc['2025-12']['Volume'].mean()  # same for December
+print(f'Jan avg volume: {jan_vol:,.0f}')      # :,.0f = commas + no decimal places
 print(f'Dec avg volume: {dec_vol:,.0f}')
 winner = 'January' if jan_vol > dec_vol else 'December'
+# inline if/else (ternary expression): evaluates to 'January' if the condition is True, else 'December'
 print(f'\n{winner} was more actively traded.')</pre></div>
       </details>
     </div>
@@ -1176,10 +1201,10 @@ df_raw</textarea>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>import pandas as pd
-df_raw = pd.read_csv('data/AAPL_2026_raw.csv')
-df_raw
+df_raw = pd.read_csv('data/AAPL_2026_raw.csv')  # load the messy raw data; kept in df_raw as a backup we never modify
+df_raw                                            # display the table — look for anything suspicious
 # then:
-df_raw.info()</pre></div>
+df_raw.info()  # check column types and non-null counts — a column with fewer non-nulls than total rows has missing values</pre></div>
       </details>
     </div>
   </div>
@@ -1211,7 +1236,10 @@ df_raw.info()</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df_raw.isnull().sum().sum()</pre></div>
+        <div class="solution-body"><pre>df_raw.isnull().sum().sum()
+# .isnull()    → creates a True/False table the same size as df_raw (True = missing value)
+# .sum()       → first call: collapses to one count per column (number of Trues in each)
+# .sum()       → second call: adds all those column counts into one grand total</pre></div>
       </details>
     </div>
 
@@ -1234,7 +1262,11 @@ df_raw.info()</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>(df_raw.isnull().sum() / len(df_raw) * 100).round(2)</pre></div>
+        <div class="solution-body"><pre>(df_raw.isnull().sum() / len(df_raw) * 100).round(2)
+# .isnull().sum()  → per-column count of missing values
+# / len(df_raw)    → divide by total number of rows to get a proportion (0 to 1)
+# * 100            → convert to a percentage
+# .round(2)        → round each result to 2 decimal places</pre></div>
       </details>
     </div>
   </div>
@@ -1286,14 +1318,14 @@ df</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df = df_raw.copy()
-df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
-df.set_index('Date', inplace=True)
-df.sort_index(inplace=True)
-df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
-df.drop_duplicates(inplace=True)
-print(f'Removed {len(df_raw) - len(df)} duplicate rows')
-df</pre></div>
+        <div class="solution-body"><pre>df = df_raw.copy()                                       # make an independent copy — changes to df won't touch df_raw
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)   # convert text dates to datetime; dayfirst=True because format is DD/MM/YYYY
+df.set_index('Date', inplace=True)                       # make Date the row index; inplace=True modifies df directly (no reassignment needed)
+df.sort_index(inplace=True)                              # sort rows oldest → newest by their date index
+df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)  # remove columns we don't need for price analysis
+df.drop_duplicates(inplace=True)                         # delete any row that is an exact copy of an earlier row
+print(f'Removed {len(df_raw) - len(df)} duplicate rows')  # f-string: shows how many rows were cut
+df                                                       # display the cleaned table</pre></div>
       </details>
     </div>
 
@@ -1317,7 +1349,10 @@ df</pre></div>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>print(f'Sorted:     {df.index.is_monotonic_increasing}')
-print(f'Duplicates: {df.index.duplicated().sum()}')</pre></div>
+# is_monotonic_increasing: property (no parentheses) — True if every date is strictly later than the one before
+print(f'Duplicates: {df.index.duplicated().sum()}')
+# .duplicated() → True for each index entry that is a repeat of an earlier one
+# .sum()        → counts those Trues — should be 0 after cleaning</pre></div>
       </details>
     </div>
   </div>
@@ -1349,7 +1384,7 @@ print(f'Duplicates: {df.index.duplicated().sum()}')</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df.info()</pre></div>
+        <div class="solution-body"><pre>df.info()  # confirms: only the expected columns remain, DatetimeIndex is set, and Non-Null count equals total rows</pre></div>
       </details>
     </div>
 
@@ -1437,11 +1472,23 @@ df.isnull().sum()</textarea>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>df['Close'] = df['Close'].ffill().bfill()
+# ffill(): replace NaN with the most recent previous value (yesterday's close)
+# .bfill(): chained after as a fallback — catches the very first row if it's NaN (nothing before it to forward-fill)
+
 df['Volume'] = df['Volume'].fillna(df['Volume'].median())
+# fillna(): replace NaN with a specific value; median() = the middle value when sorted — robust against extreme spikes
+
 df['Open'] = df['Open'].interpolate(method='linear')
+# interpolate(): estimate missing values as a straight line between the known values on either side
+
 df['High'] = df['High'].fillna(df[['Close', 'Open']].max(axis=1))
+# df[['Close','Open']] selects two columns; .max(axis=1) takes the larger of the two for each row individually
+# axis=1 means "across columns" (left to right); axis=0 would mean "down rows"
+
 df['Low'] = df['Low'].fillna(df['High'] * 0.97)
-df.isnull().sum()</pre></div>
+# approximate: assume Low was 3% below High — a simple but reasonable stand-in
+
+df.isnull().sum()  # verify: every column should now show 0 missing values</pre></div>
       </details>
     </div>
 
@@ -1544,9 +1591,9 @@ df.head()</textarea>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>df['Volume'] = df['Volume'].astype('int64')
-print(df['Volume'].dtype)
-df.head()</pre></div>
+        <div class="solution-body"><pre>df['Volume'] = df['Volume'].astype('int64')  # cast from float64 to integer — only valid now that no NaN remains (NaN can't be stored as int)
+print(df['Volume'].dtype)                    # should print int64
+df.head()                                    # head() shows the first 5 rows — visually check that Volume looks like a whole number</pre></div>
       </details>
     </div>
 
@@ -1580,8 +1627,15 @@ df.describe()</textarea>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>df.describe()
-# The "count" row should be the same for every column — equal to len(df).
-# If any count is lower, there are still NaN values somewhere.</pre></div>
+# describes every numeric column with 8 stats:
+# count  → number of non-NaN rows (should equal len(df) — no missing data left)
+# mean   → average value
+# std    → standard deviation (how spread out the values are)
+# min    → lowest value seen
+# 25%    → first quartile (25% of values fall below this)
+# 50%    → median (middle value)
+# 75%    → third quartile (75% fall below this)
+# max    → highest value seen</pre></div>
       </details>
     </div>
   </div>
