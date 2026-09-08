@@ -604,6 +604,7 @@ details.solution[open] summary { border-bottom: 1px solid var(--border); }
       <h1>Time Series Data</h1>
       <p>You'll learn to load real stock data, explore it, filter it, and extract exactly the information you need — all using pandas, Python's most popular data library.</p>
     </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s1', this)">▶ Run All</button>
   </div>
 
   <!-- ── Loading ── -->
@@ -1127,6 +1128,7 @@ print(f'\n{winner} was more actively traded.')</pre></div>
       <h1>Data Cleaning</h1>
       <p>Real-world financial data is messy — wrong order, duplicates, missing values, junk columns. This session teaches you how to diagnose and fix each issue systematically using pandas.</p>
     </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s2a', this)">▶ Run All</button>
   </div>
 
   <!-- ── Intro ── -->
@@ -1241,8 +1243,10 @@ df_raw.info()</pre></div>
   <div class="lesson" id="s2a-sort">
     <h2>🔄 Sorting and Removing Duplicates</h2>
     <div class="concept-box">
-      <p><strong>Why sort?</strong> If dates are out of order, any "rolling" calculation (like a moving average) will be wrong. We first set the date as the index (<code>set_index("Date")</code>), convert it to datetime, then sort it (<code>sort_index()</code>).</p>
-      <p><strong>Why remove duplicates?</strong> If the same date appears twice, averages and sums will be inflated. <code>drop_duplicates()</code> keeps the first occurrence and removes the rest. We can chain this with sorting in one expression.</p>
+      <p><strong>Why sort?</strong> If dates are out of order, any rolling calculation (like a moving average) will be wrong. We first convert the Date column with <code>pd.to_datetime()</code> — this turns a text string like <code>"02/01/2026"</code> into a real date Python can sort and compare. The option <code>dayfirst=True</code> tells pandas the format is DD/MM/YYYY, not MM/DD/YYYY.</p>
+      <p><strong>Why copy?</strong> <code>df = df_raw.copy()</code> creates a completely independent copy of the data. Without it, changes to <code>df</code> would silently modify <code>df_raw</code> too — always copy before cleaning.</p>
+      <p><strong>What is <code>inplace=True</code>?</strong> Most pandas methods return a <em>new</em> DataFrame and leave the original unchanged. Adding <code>inplace=True</code> modifies the DataFrame directly, so you don't need to write <code>df = df.sort_index()</code> — it just happens. Both styles are equivalent; <code>inplace=True</code> saves a line.</p>
+      <p><strong>Why remove duplicates?</strong> If the same date appears twice, averages and sums will be inflated. <code>drop_duplicates()</code> keeps the first occurrence of any repeated row and removes the rest.</p>
     </div>
 
     <div class="exercise-block">
@@ -1298,7 +1302,7 @@ df</pre></div>
         <span class="exercise-badge variation">Variation</span>
         <h3>Confirm the index is sorted</h3>
       </div>
-      <p class="exercise-desc">After sorting, verify by checking <code>df.index.is_monotonic_increasing</code> — this should return <code>True</code>. Also check <code>df.index.duplicated().sum()</code> to confirm zero duplicate index entries remain.</p>
+      <p class="exercise-desc">After sorting, verify two things. First: <code>df.index.is_monotonic_increasing</code> — this is a property (no parentheses) that returns <code>True</code> if every date is strictly newer than the one before it. Second: <code>df.index.duplicated().sum()</code> — <code>duplicated()</code> returns a True/False flag for each row that is a repeat of an earlier one; <code>.sum()</code> counts the Trues. Both should be <code>True</code> and <code>0</code> after cleaning.</p>
       <div class="cell" id="cell-s2-3b">
         <div class="cell-toolbar">
           <span class="cell-num">In [ ]</span>
@@ -1374,11 +1378,11 @@ print(f'Duplicates: {df.index.duplicated().sum()}')</pre></div>
     <h2>🩹 Handling Missing Values</h2>
     <div class="concept-box">
       <p>Different columns need different fill strategies depending on what the value means:</p>
-      <p>• <strong>Close</strong> → <code>ffill().bfill()</code>: forward fill first (yesterday's close), then backward fill as a safety net if the very first row is NaN.<br>
-      • <strong>Volume</strong> → <code>fillna(df["Volume"].median())</code>: use the median volume. Volume can vary wildly, so median is safer than mean.<br>
-      • <strong>Open</strong> → <code>interpolate()</code>: linearly interpolate between the surrounding values.<br>
-      • <strong>High</strong> → <code>df[["Close","Open"]].max(axis=1)</code>: High must be at least the max of Open and Close.<br>
-      • <strong>Low</strong> → <code>High * 0.97</code>: assume Low was 3% below High.</p>
+      <p>• <strong>Close</strong> → <code>ffill().bfill()</code>: <strong>forward fill</strong> uses the last known value (yesterday's close). <strong>backward fill</strong> is chained after as a safety net — if the very first row is NaN, ffill has nothing to pull from, so bfill grabs the next known value instead.<br>
+      • <strong>Volume</strong> → <code>fillna(df["Volume"].median())</code>: replace missing volume with the median (middle value) of all volumes. Median is safer than mean here because volume has spikes that would skew the average.<br>
+      • <strong>Open</strong> → <code>interpolate(method='linear')</code>: estimates the missing value as a straight line between the values before and after it. For example, if Open was 100 on Monday and 106 on Wednesday, the missing Tuesday gets 103.<br>
+      • <strong>High</strong> → <code>df[["Close","Open"]].max(axis=1)</code>: <code>axis=1</code> means "take the max across columns" (left to right) rather than down rows. This gives the higher of the two prices for each row individually — High must be at least the highest price seen that day.<br>
+      • <strong>Low</strong> → <code>High * 0.97</code>: a simple approximation — if we have no Low data, assume it was 3% below High. This is a reasonable stand-in for a missing value.</p>
     </div>
 
     <div class="exercise-block">
@@ -1446,7 +1450,7 @@ df.isnull().sum()</pre></div>
         <span class="exercise-badge variation">Variation</span>
         <h3>Try bfill instead of ffill for Close</h3>
       </div>
-      <p class="exercise-desc">Reload the data from scratch (<code>df_raw</code>) and this time use <code>bfill()</code> (backward fill — uses tomorrow's value) for Close instead of <code>ffill()</code>. Compare which approach makes more financial sense for a missing closing price. (Reset <code>df</code> first using the cells above.)</p>
+      <p class="exercise-desc">Starting from <code>df_raw</code>, build a quick clean copy called <code>df_compare</code> (same steps as before). Then create two new columns on it: <code>'Close_ffill'</code> using <code>.ffill()</code> and <code>'Close_bfill'</code> using <code>.bfill()</code>. Finally, filter to rows where Close was originally missing and display those two columns side by side. Which fill makes more financial sense — using yesterday's or tomorrow's close?</p>
       <div class="cell" id="cell-s2-5b">
         <div class="cell-toolbar">
           <span class="cell-num">In [ ]</span>
@@ -1455,40 +1459,56 @@ df.isnull().sum()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s2-5b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
-          data-default="# Demonstrate bfill on Close
-_d = df_raw.copy()
-_d['Date'] = pd.to_datetime(_d['Date'], dayfirst=True)
-test = _d.set_index('Date').sort_index().drop_duplicates()
-test = test.drop(columns=['Dividends', 'Stock Splits'])
+          data-default="# Build a clean working copy from df_raw (same steps as before)
+df_compare = df_raw.copy()
+df_compare['Date'] = pd.to_datetime(df_compare['Date'], dayfirst=True)
+df_compare = df_compare.set_index('Date').sort_index().drop_duplicates()
+df_compare = df_compare.drop(columns=['Dividends', 'Stock Splits'])
 
-# Show a row with missing Close, then compare ffill vs bfill
-missing_dates = test[test['Close'].isnull()].index
-print('Missing Close dates:', missing_dates[:3].tolist())
+# Find rows where Close is missing
+missing_dates = df_compare[df_compare['Close'].isnull()].index
+print('Rows with missing Close:', len(missing_dates))
 
-# bfill fills from the NEXT known value
-test['Close_bfill'] = test['Close'].bfill()
-test['Close_ffill'] = test['Close'].ffill()
-test.loc[missing_dates[:3], ['Close_bfill', 'Close_ffill']]"># Demonstrate bfill on Close
-_d = df_raw.copy()
-_d['Date'] = pd.to_datetime(_d['Date'], dayfirst=True)
-test = _d.set_index('Date').sort_index().drop_duplicates()
-test = test.drop(columns=['Dividends', 'Stock Splits'])
+# Add two new columns: one filled forward, one backward
+df_compare['Close_ffill'] = df_compare['Close'].ffill()
+df_compare['Close_bfill'] = df_compare['Close'].bfill()
 
-# Show a row with missing Close, then compare ffill vs bfill
-missing_dates = test[test['Close'].isnull()].index
-print('Missing Close dates:', missing_dates[:3].tolist())
+# Show just those missing rows, comparing both approaches
+df_compare.loc[missing_dates, ['Close', 'Close_ffill', 'Close_bfill']]"># Build a clean working copy from df_raw (same steps as before)
+df_compare = df_raw.copy()
+df_compare['Date'] = pd.to_datetime(df_compare['Date'], dayfirst=True)
+df_compare = df_compare.set_index('Date').sort_index().drop_duplicates()
+df_compare = df_compare.drop(columns=['Dividends', 'Stock Splits'])
 
-# bfill fills from the NEXT known value
-test['Close_bfill'] = test['Close'].bfill()
-test['Close_ffill'] = test['Close'].ffill()
-test.loc[missing_dates[:3], ['Close_bfill', 'Close_ffill']]</textarea>
+# Find rows where Close is missing
+missing_dates = df_compare[df_compare['Close'].isnull()].index
+print('Rows with missing Close:', len(missing_dates))
+
+# Add two new columns: one filled forward, one backward
+df_compare['Close_ffill'] = df_compare['Close'].ffill()
+df_compare['Close_bfill'] = df_compare['Close'].bfill()
+
+# Show just those missing rows, comparing both approaches
+df_compare.loc[missing_dates, ['Close', 'Close_ffill', 'Close_bfill']]</textarea>
         <div class="cell-output" id="output-cell-s2-5b"></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre># ffill uses yesterday's close → more common in finance (last known price)
-# bfill uses tomorrow's close → introduces "look-ahead bias" (you wouldn't know this yet!)
-# For backtesting and fair financial analysis, ffill is safer.</pre></div>
+        <div class="solution-body"><pre>df_compare = df_raw.copy()
+df_compare['Date'] = pd.to_datetime(df_compare['Date'], dayfirst=True)
+df_compare = df_compare.set_index('Date').sort_index().drop_duplicates()
+df_compare = df_compare.drop(columns=['Dividends', 'Stock Splits'])
+
+missing_dates = df_compare[df_compare['Close'].isnull()].index
+print('Rows with missing Close:', len(missing_dates))
+
+df_compare['Close_ffill'] = df_compare['Close'].ffill()
+df_compare['Close_bfill'] = df_compare['Close'].bfill()
+
+# ffill: uses yesterday's close → standard in finance (last known price)
+# bfill: uses tomorrow's close → "look-ahead bias" — in real life you don't know tomorrow's price yet!
+# Conclusion: always use ffill for financial time series.
+df_compare.loc[missing_dates, ['Close', 'Close_ffill', 'Close_bfill']]</pre></div>
       </details>
     </div>
   </div>
@@ -1533,9 +1553,9 @@ df.head()</pre></div>
     <div class="exercise-block">
       <div class="exercise-header">
         <span class="exercise-badge variation">Variation</span>
-        <h3>Save the clean data to a file</h3>
+        <h3>Inspect the final clean DataFrame</h3>
       </div>
-      <p class="exercise-desc">Use <code>df.to_csv("data/AAPL_2026_clean.csv")</code> to save the cleaned DataFrame. Then reload it with <code>pd.read_csv()</code> and compare <code>df_reload.info()</code> — notice anything about the Date index after reloading?</p>
+      <p class="exercise-desc">Now that the DataFrame is fully cleaned, use <code>df.describe()</code> to get summary statistics for every column — count, mean, min, max, and the 25th/50th/75th percentiles. This is a standard sanity check: do the price ranges look reasonable for a stock? Is the minimum Close greater than zero? Are there any surprises?</p>
       <div class="cell" id="cell-s2-6b">
         <div class="cell-toolbar">
           <span class="cell-num">In [ ]</span>
@@ -1544,26 +1564,24 @@ df.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s2-6b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
-          data-default="import io
-
-# Save to a virtual CSV string (simulates writing to disk)
-csv_str = df.to_csv()
-df_reload = pd.read_csv(io.StringIO(csv_str), index_col='Date', parse_dates=True)
-print('Reloaded shape:', df_reload.shape)
-df_reload.info()">import io
-
-# Save to a virtual CSV string (simulates writing to disk)
-csv_str = df.to_csv()
-df_reload = pd.read_csv(io.StringIO(csv_str), index_col='Date', parse_dates=True)
-print('Reloaded shape:', df_reload.shape)
-df_reload.info()</textarea>
+          data-default="# describe() gives summary stats for every numeric column at once
+# count = number of non-NaN values (should now equal len(df) — no missing data!)
+# mean = average, std = standard deviation (spread)
+# min/max = lowest and highest values seen
+# 25%, 50%, 75% = quartiles (50% is the median)
+df.describe()"># describe() gives summary stats for every numeric column at once
+# count = number of non-NaN values (should now equal len(df) — no missing data!)
+# mean = average, std = standard deviation (spread)
+# min/max = lowest and highest values seen
+# 25%, 50%, 75% = quartiles (50% is the median)
+df.describe()</textarea>
         <div class="cell-output" id="output-cell-s2-6b"></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre># Notice: when reloading, use index_col='Date' and parse_dates=True
-# to restore the datetime index correctly.
-# Without these, Date becomes a plain text column again!</pre></div>
+        <div class="solution-body"><pre>df.describe()
+# The "count" row should be the same for every column — equal to len(df).
+# If any count is lower, there are still NaN values somewhere.</pre></div>
       </details>
     </div>
   </div>
@@ -1574,6 +1592,10 @@ df_reload.info()</textarea>
     <div class="concept-box">
       <p>The simplest investment strategy is <strong>buy &amp; hold</strong>: buy a stock on a given date, hold it, and sell later. Your return is:</p>
       <pre style="background:var(--bg3);padding:10px 14px;border-radius:6px;font-size:13px;margin-top:8px;">return = (sell_price − buy_price) / buy_price × 100</pre>
+      <p style="margin-top:10px;"><strong>Two new tools you'll use here:</strong></p>
+      <p>• <code>df.loc['2026-01']</code> — when your index is dates, you can slice using a string. <code>'2026-01'</code> means "all rows in January 2026". <code>'2026-03'</code> means all of March, and so on. This only works because we set Date as the index and converted it to datetime.<br>
+      • <code>.iloc[0]</code> and <code>.iloc[-1]</code> — <code>iloc</code> stands for "integer location". It selects rows by their position number, not by their label. <code>iloc[0]</code> is the very first row; <code>iloc[-1]</code> is the last row. <code>iloc[-2]</code> would be second-to-last, and so on.<br>
+      • <code>f'Buy price: ${buy_price:.2f}'</code> — the <code>:.2f</code> inside curly braces is a format code: it rounds the number to 2 decimal places and displays it as a float. <code>.0f</code> would give zero decimals, <code>.4f</code> would give four.</p>
       <p style="margin-top:10px;">This section uses the cleaned 2026 DataFrame (<code>df</code>) you built in the previous exercises. Make sure you've run the cleaning cells above before starting.</p>
     </div>
 
@@ -2217,17 +2239,7 @@ async function runAllInSection(sectionId, btn) {
   btn.textContent = '▶ Run All';
 }
 
-// Inject Run All button into each session hero
-document.querySelectorAll('.page-section').forEach(sec => {
-  const hero = sec.querySelector('.session-hero');
-  if (!hero) return;
-  const btn = document.createElement('button');
-  btn.className = 'run-all-btn';
-  btn.textContent = '▶ Run All';
-  btn.disabled = true; // enabled when Pyodide is ready
-  btn.onclick = () => runAllInSection(sec.id, btn);
-  hero.appendChild(btn);
-});
+// Run All buttons are now static in the HTML; no injection needed.
 
 // Disable run buttons until ready
 document.querySelectorAll('.run-btn').forEach(b => b.disabled = true);
