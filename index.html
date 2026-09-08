@@ -293,9 +293,16 @@ header .spacer { flex: 1; }
   color: var(--code-text); padding: 12px 16px; white-space: pre-wrap;
   line-height: 1.55; overflow-x: auto;
 }
+.out-err-banner {
+  font-family: 'Inter', system-ui, sans-serif; font-size: 13px; font-weight: 500;
+  color: #FF7B72; background: rgba(255,123,114,.09);
+  border-left: 3px solid #FF7B72;
+  padding: 10px 14px; line-height: 1.5;
+}
 .out-err {
-  font-family: 'JetBrains Mono', monospace; font-size: 13px;
-  color: #FF7B72; padding: 12px 16px; white-space: pre-wrap; line-height: 1.55;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: rgba(255,123,114,.65); padding: 10px 16px; white-space: pre-wrap; line-height: 1.5;
+  border-top: 1px solid rgba(255,123,114,.15);
 }
 .out-img { padding: 12px 16px; }
 .out-img img { max-width: 100%; border-radius: 6px; }
@@ -1703,14 +1710,17 @@ print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>buy_price = df.loc['2026-01']['Close'].iloc[0]
+# df.loc['2026-01'] → all rows in January 2026 (works because the index is datetime)
+# ['Close']         → take the Close column from that slice
+# .iloc[0]          → first row by position = first trading day of January
 
-sell_march = df.loc['2026-03']['Close'].iloc[-1]
-return_march = (sell_march - buy_price) / buy_price * 100
+sell_march = df.loc['2026-03']['Close'].iloc[-1]  # last trading day of March (iloc[-1] = last row)
+return_march = (sell_march - buy_price) / buy_price * 100  # standard return formula: gain / cost × 100
 
-sell_april = df.loc['2026-04']['Close'].iloc[-1]
+sell_april = df.loc['2026-04']['Close'].iloc[-1]  # last trading day of April
 return_april = (sell_april - buy_price) / buy_price * 100
 
-print(f'Buy price (Jan 2026):    ${buy_price:.2f}')
+print(f'Buy price (Jan 2026):    ${buy_price:.2f}')   # :.2f = format as float with 2 decimal places
 print(f'Sell end-of-March:       ${sell_march:.2f}  →  Return: {return_march:.2f}%')
 print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.2f}%')</pre></div>
       </details>
@@ -2021,9 +2031,84 @@ finally:
   cell.querySelector('.cell-num').textContent = 'Out';
 }
 
+/* ---------- plain-English error explainer (no AI needed) ---------- */
+function explainError(text) {
+  const lines = text.trim().split('\n');
+  // Walk from the end to find the first line with "ErrorType: message"
+  let errorLine = '';
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (/^\w[\w.]*Error\s*:|^\w[\w.]*Exception\s*:|^SyntaxError\s*:|^IndentationError\s*:/.test(lines[i].trim())) {
+      errorLine = lines[i].trim();
+      break;
+    }
+  }
+  if (!errorLine) return null;
+
+  const m = errorLine.match(/^([\w.]+(?:Error|Exception|Warning)?)\s*:\s*(.*)$/);
+  if (!m) return null;
+  const [, errType, errMsg] = m;
+
+  switch (errType) {
+    case 'NameError': {
+      const v = errMsg.match(/name ['"](.+?)['"]/)?.[1];
+      return v
+        ? `"${v}" isn't defined yet — make sure you've run the cell that creates it first (use Run All ▶ if unsure).`
+        : 'A variable was used before it was created. Run the earlier cells first.';
+    }
+    case 'KeyError': {
+      const k = errMsg.replace(/^['"]+|['"]+$/g, '');
+      return `Column or key ${k ? '"'+k+'"' : ''} not found. Column names are case-sensitive — check the exact spelling with df.columns.`;
+    }
+    case 'AttributeError': {
+      const a = errMsg.match(/has no attribute ['"](.+?)['"]/)?.[1];
+      const t = errMsg.match(/^['"]?(\w+)['"]? object/)?.[1];
+      if (a && t) return `"${t}" objects don't have a .${a} method. Check the spelling, or make sure your variable is the right type.`;
+      return 'A method or attribute doesn\'t exist on this object — check spelling and that the variable has the type you expect.';
+    }
+    case 'TypeError': {
+      if (errMsg.includes('unsupported operand')) return 'You\'re mixing incompatible types (e.g. string + number). Check column dtypes with df.dtypes.';
+      if (errMsg.includes('not callable')) return 'You\'re calling something as a function (with parentheses) that isn\'t one — e.g. df.shape() should be df.shape.';
+      if (errMsg.includes('takes')) return `Wrong number of arguments passed to a function. ${errMsg}`;
+      return `Type mismatch: ${errMsg}`;
+    }
+    case 'ValueError': {
+      if (/nan|NaN/.test(errMsg)) return 'Your data still contains missing values (NaN). Fill or drop them before this step.';
+      if (errMsg.includes('could not convert')) return 'A value can\'t be converted to a number — there may be text or symbols in a numeric column.';
+      return `Invalid value: ${errMsg}`;
+    }
+    case 'IndexError':
+      return 'You\'re accessing a position that doesn\'t exist (e.g. iloc[99] on a short DataFrame). Check the length with len(df).';
+    case 'SyntaxError':
+    case 'IndentationError':
+      return 'Python can\'t parse this code — look for a missing colon, unclosed bracket, or inconsistent indentation.';
+    case 'ZeroDivisionError':
+      return 'Division by zero — check that your denominator isn\'t 0.';
+    case 'FileNotFoundError':
+      return 'File not found — run the cell that loads the data first.';
+    case 'ImportError':
+    case 'ModuleNotFoundError': {
+      const pkg = errMsg.match(/No module named ['"](.+?)['"]/)?.[1];
+      return pkg ? `Package "${pkg}" isn't available in this environment.` : 'A required package isn\'t available in this environment.';
+    }
+    default:
+      return `${errType}: ${errMsg}`;
+  }
+}
+
 function renderOutput(text, div, errored) {
   div.innerHTML = '';
   if (!text.trim()) { div.innerHTML = '<div class="out-text" style="color:var(--text3);font-size:12px">No output.</div>'; return; }
+
+  // Show plain-English error banner before the traceback
+  if (errored && text.includes('Traceback')) {
+    const explanation = explainError(text);
+    if (explanation) {
+      const banner = document.createElement('div');
+      banner.className = 'out-err-banner';
+      banner.textContent = '⚠ ' + explanation;
+      div.appendChild(banner);
+    }
+  }
 
   // Split on image sentinels first, then DataFrame sentinels
   const parts = text.split(/(__IMG__[^_]*__IMG__|__DF__[\s\S]*?__DF__)/);
