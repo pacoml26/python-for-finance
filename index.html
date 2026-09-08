@@ -1,0 +1,2292 @@
+<title>Finance Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F9FC;
+  --bg2: #EEF2F8;
+  --surface: #FFFFFF;
+  --border: #DDE4EF;
+  --text: #0F172A;
+  --text2: #4B5A72;
+  --text3: #8896AD;
+  --accent: #5B4CF5;
+  --accent-bg: #EDE9FE;
+  --accent-hover: #4339E0;
+  --green: #16A34A;
+  --green-bg: #DCFCE7;
+  --amber: #B45309;
+  --amber-bg: #FEF3C7;
+  --code-bg: #0D1117;
+  --code-text: #E6EDF3;
+  --code-border: #30363D;
+  --cell-num: #8896AD;
+  --run-btn: #16A34A;
+  --run-btn-text: #fff;
+  --nav-w: 240px;
+  --ai-w: 340px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1117;
+    --bg2: #161B22;
+    --surface: #161B22;
+    --border: #30363D;
+    --text: #E6EDF3;
+    --text2: #8B949E;
+    --text3: #6E7681;
+    --accent: #8B7CF6;
+    --accent-bg: #1A1540;
+    --accent-hover: #A897FA;
+    --green: #3FB950;
+    --green-bg: #0D2112;
+    --amber: #F0A84A;
+    --amber-bg: #2A1E00;
+    --code-bg: #090D13;
+    --code-text: #E6EDF3;
+    --code-border: #21262D;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1117;
+  --bg2: #161B22;
+  --surface: #161B22;
+  --border: #30363D;
+  --text: #E6EDF3;
+  --text2: #8B949E;
+  --text3: #6E7681;
+  --accent: #8B7CF6;
+  --accent-bg: #1A1540;
+  --accent-hover: #A897FA;
+  --green: #3FB950;
+  --green-bg: #0D2112;
+  --amber: #F0A84A;
+  --amber-bg: #2A1E00;
+  --code-bg: #090D13;
+  --code-text: #E6EDF3;
+  --code-border: #21262D;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── Layout ── */
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 20px; height: 52px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; z-index: 100;
+  box-shadow: var(--shadow);
+}
+.logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.logo-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: linear-gradient(135deg, #5B4CF5 0%, #9B87F5 100%);
+  display: grid; place-items: center; font-size: 14px; flex-shrink: 0;
+}
+.logo-text { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); }
+.logo-sub { font-size: 11px; font-weight: 500; color: var(--text3); margin-left: 4px; }
+header .spacer { flex: 1; }
+.hdr-btn {
+  display: flex; align-items: center; gap: 6px; padding: 5px 12px;
+  border-radius: 7px; border: 1px solid var(--border); background: var(--bg);
+  color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.hdr-btn:hover { background: var(--bg2); color: var(--text); }
+.hdr-btn.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+#py-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text3); flex-shrink: 0;
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--amber);
+  animation: pulse 1.4s infinite;
+}
+.status-dot.ready { background: var(--green); animation: none; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+#layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width: var(--nav-w); flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 12px 0;
+  display: flex; flex-direction: column; gap: 0;
+}
+.nav-section { margin-bottom: 4px; }
+.nav-section-title {
+  padding: 6px 16px 4px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text3);
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px; cursor: pointer; border-radius: 0;
+  font-size: 13.5px; color: var(--text2); transition: background .12s, color .12s;
+  text-decoration: none; border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--bg2); color: var(--text); }
+.nav-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+.nav-item .nav-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--border); flex-shrink: 0;
+}
+.nav-item.active .nav-dot { background: var(--accent); }
+.nav-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* ── Main Content ── */
+#content {
+  flex: 1; overflow-y: auto; padding: 40px 60px;
+  scroll-behavior: smooth;
+}
+@media (max-width: 900px) { #content { padding: 24px 20px; } }
+
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* ── Hero ── */
+.session-hero {
+  display: flex; align-items: flex-start; gap: 24px;
+  padding: 28px 32px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-bg) 0%, var(--bg) 100%);
+  border: 1px solid var(--border); margin-bottom: 40px;
+}
+.session-hero .hero-num {
+  font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 700;
+  color: var(--accent); opacity: .25; line-height: 1; flex-shrink: 0;
+}
+.session-hero h1 {
+  font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700;
+  color: var(--text); margin-bottom: 6px;
+}
+.session-hero p { font-size: 15px; color: var(--text2); max-width: 600px; }
+
+/* ── Lesson ── */
+.lesson { margin-bottom: 56px; }
+.lesson h2 {
+  font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 600;
+  color: var(--text); margin-bottom: 14px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+
+.concept-box {
+  background: var(--bg2); border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0; padding: 16px 20px; margin-bottom: 22px;
+  font-size: 14.5px; color: var(--text2); line-height: 1.7;
+}
+.concept-box p + p { margin-top: 10px; }
+.concept-box code {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  background: var(--code-bg); color: #79C0FF;
+  padding: 1px 5px; border-radius: 4px;
+}
+.concept-box strong { color: var(--text); font-weight: 600; }
+
+.tip-box {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--amber-bg); border-radius: 8px; padding: 12px 16px;
+  margin-bottom: 18px; font-size: 13.5px; color: var(--amber);
+}
+.tip-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+/* ── Exercise Block ── */
+.exercise-block { margin-bottom: 28px; }
+.exercise-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.exercise-badge {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  padding: 2px 8px; border-radius: 5px;
+  text-transform: uppercase; flex-shrink: 0;
+}
+.exercise-badge.original { background: var(--accent-bg); color: var(--accent); }
+.exercise-badge.variation {
+  background: var(--green-bg); color: var(--green);
+}
+.exercise-header h3 {
+  font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: var(--text);
+}
+.exercise-desc {
+  font-size: 14px; color: var(--text2); margin-bottom: 12px; line-height: 1.65;
+}
+.exercise-desc code {
+  font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  background: var(--code-bg); color: #79C0FF;
+  padding: 1px 5px; border-radius: 4px;
+}
+
+/* ── Code Cell ── */
+.cell {
+  border: 1px solid var(--code-border); border-radius: 10px; overflow: hidden;
+  background: var(--code-bg); margin-bottom: 8px;
+}
+.cell-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-bottom: 1px solid var(--code-border);
+  background: rgba(255,255,255,.03);
+}
+.cell-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--cell-num); flex-shrink: 0; width: 32px;
+}
+.cell-toolbar .spacer { flex: 1; }
+.run-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 5px;
+  background: var(--green); color: #fff;
+  font-size: 12px; font-weight: 600; border: none; cursor: pointer;
+  transition: background .15s, opacity .15s;
+}
+.run-btn:hover { filter: brightness(1.1); }
+.run-btn:disabled { opacity: .45; cursor: not-allowed; }
+.reset-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 5px;
+  background: transparent; color: var(--text3);
+  font-size: 12px; font-weight: 500; border: 1px solid var(--code-border); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.reset-btn:hover { background: rgba(255,255,255,.05); color: var(--code-text); }
+.code-input {
+  display: block; width: 100%; min-height: 80px;
+  background: transparent; color: var(--code-text);
+  font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.65;
+  padding: 14px 16px; border: none; outline: none; resize: vertical;
+  tab-size: 4;
+}
+.cell-output {
+  border-top: 1px solid var(--code-border);
+  background: var(--code-bg); padding: 0;
+}
+.cell-output:empty { display: none; }
+.out-text {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--code-text); padding: 12px 16px; white-space: pre-wrap;
+  line-height: 1.55; overflow-x: auto;
+}
+.out-err {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: #FF7B72; padding: 12px 16px; white-space: pre-wrap; line-height: 1.55;
+}
+.out-img { padding: 12px 16px; }
+.out-img img { max-width: 100%; border-radius: 6px; }
+
+/* ── DataFrame paginated table ── */
+.df-wrapper { padding: 10px 16px 14px; overflow: hidden; }
+.df-controls {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.df-info {
+  font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace;
+  flex: 1;
+}
+.df-page-label {
+  font-size: 12px; color: var(--text2); white-space: nowrap;
+}
+.df-page-select {
+  font-size: 12.5px; padding: 3px 7px; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--bg2); color: var(--text1);
+  cursor: pointer; font-family: inherit;
+}
+.df-page-select:focus { outline: none; border-color: var(--accent); }
+.df-nav { display: flex; gap: 4px; }
+.df-nav button {
+  font-size: 12.5px; padding: 3px 9px; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--bg2); color: var(--text1);
+  cursor: pointer; transition: background .12s;
+}
+.df-nav button:hover:not(:disabled) { background: var(--bg3); }
+.df-nav button:disabled { opacity: .35; cursor: default; }
+.df-scroll { overflow-x: auto; border-radius: 6px; border: 1px solid var(--border); }
+.df-table {
+  border-collapse: collapse; font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; width: 100%; white-space: nowrap;
+}
+.df-table th {
+  background: var(--bg2); color: var(--text2); font-weight: 600;
+  padding: 6px 12px; border-bottom: 1px solid var(--border);
+  text-align: left; position: sticky; top: 0;
+}
+.df-table td {
+  padding: 5px 12px; color: var(--code-text);
+  border-bottom: 1px solid var(--code-border); text-align: right;
+}
+.df-table td:first-child { color: var(--text3); text-align: left; border-right: 1px solid var(--code-border); }
+.df-table th:first-child { text-align: left; }
+.df-table tr:last-child td { border-bottom: none; }
+.df-table tr:hover td { background: var(--bg2); }
+
+/* ── Solution ── */
+details.solution {
+  border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden; margin-top: 6px;
+}
+details.solution summary {
+  padding: 10px 14px; cursor: pointer; font-size: 13.5px;
+  font-weight: 500; color: var(--text2); list-style: none;
+  display: flex; align-items: center; gap: 8px;
+  user-select: none; background: var(--bg2); transition: background .12s;
+}
+details.solution summary:hover { background: var(--bg2); filter: brightness(.97); }
+details.solution summary::before {
+  content: '▶'; font-size: 10px; transition: transform .18s; color: var(--text3);
+}
+details.solution[open] summary::before { transform: rotate(90deg); }
+details.solution[open] summary { border-bottom: 1px solid var(--border); }
+.solution-body {
+  background: var(--code-bg); padding: 0;
+}
+.solution-body pre {
+  font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+  color: var(--code-text); padding: 16px; overflow-x: auto; line-height: 1.6;
+}
+
+/* ── AI Panel ── */
+#ai-toggle {
+  position: fixed; bottom: 24px; right: 24px; z-index: 200;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  border: none; cursor: pointer; font-size: 18px;
+  box-shadow: 0 4px 16px rgba(91,76,245,.45);
+  display: grid; place-items: center; transition: background .15s, transform .15s;
+}
+#ai-toggle:hover { background: var(--accent-hover); transform: scale(1.06); }
+#ai-panel {
+  position: fixed; right: -360px; top: 52px; bottom: 0;
+  width: var(--ai-w); z-index: 150;
+  background: var(--surface); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: right .28s cubic-bezier(.4,0,.2,1);
+  box-shadow: var(--shadow-md);
+}
+#ai-panel.open { right: 0; }
+
+.ai-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.ai-header h4 { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; flex: 1; }
+.ai-close {
+  background: none; border: none; color: var(--text3); cursor: pointer;
+  font-size: 18px; line-height: 1; padding: 2px; border-radius: 4px;
+}
+.ai-close:hover { color: var(--text); }
+
+.api-setup {
+  padding: 16px; border-bottom: 1px solid var(--border); background: var(--bg2);
+  flex-shrink: 0;
+}
+.api-setup p { font-size: 12.5px; color: var(--text3); margin-bottom: 10px; }
+.api-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.api-select, .api-input {
+  height: 34px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 13px;
+  padding: 0 10px; outline: none;
+}
+.api-select { flex-shrink: 0; }
+.api-input { flex: 1; min-width: 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.api-save {
+  padding: 6px 14px; border-radius: 7px; border: none;
+  background: var(--accent); color: #fff; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background .15s; width: 100%;
+}
+.api-save:hover { background: var(--accent-hover); }
+.api-saved { display: flex; align-items: center; gap: 8px; }
+.api-saved-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.api-saved-text { font-size: 12.5px; color: var(--text2); flex: 1; }
+.api-change-btn { font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: none; }
+
+#ai-messages {
+  flex: 1; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.msg {
+  max-width: 90%; display: flex; flex-direction: column; gap: 4px;
+}
+.msg.user { align-self: flex-end; align-items: flex-end; }
+.msg.ai { align-self: flex-start; align-items: flex-start; }
+.msg-bubble {
+  padding: 9px 13px; border-radius: 12px; font-size: 13.5px; line-height: 1.55;
+}
+.msg.user .msg-bubble { background: var(--accent); color: #fff; border-radius: 12px 12px 3px 12px; }
+.msg.ai .msg-bubble { background: var(--bg2); color: var(--text); border-radius: 12px 12px 12px 3px; }
+.msg-code-block {
+  background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 8px; overflow: hidden; margin-top: 6px; width: 100%;
+}
+.msg-code-toolbar {
+  display: flex; align-items: center; padding: 6px 10px;
+  border-bottom: 1px solid var(--code-border); background: rgba(255,255,255,.03);
+}
+.msg-code-lang { font-size: 11px; color: var(--text3); flex: 1; font-family: 'JetBrains Mono', monospace; }
+.apply-btn {
+  font-size: 11.5px; font-weight: 600; padding: 3px 10px;
+  border-radius: 5px; border: none;
+  background: var(--accent); color: #fff; cursor: pointer;
+  transition: background .15s;
+}
+.apply-btn:hover { background: var(--accent-hover); }
+.msg-code-block pre {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--code-text); padding: 10px; overflow-x: auto; line-height: 1.55;
+}
+.ai-thinking {
+  display: flex; gap: 4px; align-items: center; padding: 10px 13px;
+  background: var(--bg2); border-radius: 12px;
+}
+.ai-thinking span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--text3);
+  animation: bounce 1.2s infinite;
+}
+.ai-thinking span:nth-child(2) { animation-delay: .2s; }
+.ai-thinking span:nth-child(3) { animation-delay: .4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+.ai-welcome {
+  text-align: center; padding: 20px 10px; color: var(--text3); font-size: 13px;
+}
+.ai-welcome .wi { font-size: 28px; margin-bottom: 8px; }
+.ai-welcome strong { display: block; font-size: 14px; color: var(--text2); margin-bottom: 4px; }
+
+.ai-input-row {
+  display: flex; gap: 8px; padding: 12px;
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+#ai-input {
+  flex: 1; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--text); font-size: 13.5px; resize: none;
+  font-family: 'Inter', sans-serif; outline: none; min-height: 38px; max-height: 120px;
+  line-height: 1.5;
+}
+#ai-input:focus { border-color: var(--accent); }
+.ai-send-btn {
+  width: 36px; height: 36px; border-radius: 8px; border: none;
+  background: var(--accent); color: #fff; cursor: pointer; font-size: 14px;
+  display: grid; place-items: center; flex-shrink: 0;
+  transition: background .15s;
+}
+.ai-send-btn:hover { background: var(--accent-hover); }
+.ai-send-btn:disabled { opacity: .4; cursor: not-allowed; }
+.ai-context-note {
+  padding: 6px 12px; font-size: 11.5px; color: var(--text3);
+  border-top: 1px solid var(--border); text-align: center;
+}
+#ai-panel.no-key .ai-input-row, #ai-panel.no-key .ai-context-note { opacity: .4; pointer-events: none; }
+
+/* ── Misc ── */
+.section-divider {
+  display: flex; align-items: center; gap: 12px; margin: 36px 0 28px;
+  color: var(--text3); font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+}
+.section-divider::before, .section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.info-banner {
+  background: var(--accent-bg); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+  font-size: 13.5px; color: var(--accent); display: flex; gap: 10px;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+
+<!-- HEADER -->
+<div id="app">
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">📊</div>
+    <span class="logo-text">Finance Python<span class="logo-sub">Imperial</span></span>
+  </a>
+  <div class="spacer"></div>
+  <div id="py-status">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Loading Python…</span>
+  </div>
+  <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
+  <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
+</header>
+
+<div id="layout">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="nav-section">
+    <div class="nav-section-title">Session 1</div>
+    <button class="nav-item active" onclick="nav('s1','s1-load')">
+      <span class="nav-dot"></span>Time Series Data
+    </button>
+    <button class="nav-item" onclick="nav('s1','s1-load')">
+      <span class="nav-dot"></span>Loading Data
+    </button>
+    <button class="nav-item" onclick="nav('s1','s1-explore')">
+      <span class="nav-dot"></span>Exploring DataFrames
+    </button>
+    <button class="nav-item" onclick="nav('s1','s1-access')">
+      <span class="nav-dot"></span>Accessing Data
+    </button>
+    <button class="nav-item" onclick="nav('s1','s1-filter')">
+      <span class="nav-dot"></span>Filtering with Masks
+    </button>
+    <button class="nav-item" onclick="nav('s1','s1-index')">
+      <span class="nav-dot"></span>Setting the Index
+    </button>
+    <button class="nav-item" onclick="nav('s1','s1-agg')">
+      <span class="nav-dot"></span>Aggregations
+    </button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 2a</div>
+    <button class="nav-item" onclick="nav('s2a','s2a-intro')">
+      <span class="nav-dot"></span>Data Cleaning
+    </button>
+    <button class="nav-item" onclick="nav('s2a','s2a-inspect')">
+      <span class="nav-dot"></span>Inspecting the Data
+    </button>
+    <button class="nav-item" onclick="nav('s2a','s2a-sort')">
+      <span class="nav-dot"></span>Sort & Deduplicate
+    </button>
+    <button class="nav-item" onclick="nav('s2a','s2a-drop')">
+      <span class="nav-dot"></span>Dropping Columns
+    </button>
+    <button class="nav-item" onclick="nav('s2a','s2a-missing')">
+      <span class="nav-dot"></span>Missing Values
+    </button>
+    <button class="nav-item" onclick="nav('s2a','s2a-types')">
+      <span class="nav-dot"></span>Data Types
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="content">
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 1                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+<div class="page-section active" id="sec-s1">
+
+  <div class="session-hero">
+    <div class="hero-num">1</div>
+    <div>
+      <h1>Time Series Data</h1>
+      <p>You'll learn to load real stock data, explore it, filter it, and extract exactly the information you need — all using pandas, Python's most popular data library.</p>
+    </div>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div class="lesson" id="s1-load">
+    <h2>📦 Loading Data with pandas</h2>
+    <div class="concept-box">
+      <p><strong>Packages</strong> are pre-built tools you add to Python. The most important one for data work is called <strong>pandas</strong>. Think of it as Excel, but inside Python — and infinitely more powerful.</p>
+      <p>We import it with the nickname <code>pd</code> because we'll type it constantly. Then <code>pd.read_csv()</code> reads a spreadsheet file (CSV = Comma-Separated Values) and turns it into a <strong>DataFrame</strong> — a table with rows and columns, which we store in the variable <code>df</code>.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Import pandas and load the data</h3>
+      </div>
+      <p class="exercise-desc">Import pandas and load Apple's 2025 stock data. Store it in a variable called <code>df</code>. Then just write <code>df</code> on the last line — Jupyter (and this page) will display it automatically.</p>
+      <div class="cell" id="cell-s1-1a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-1a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-1a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+
+df = pd.read_csv('data/AAPL_2025.csv')
+df">import pandas as pd
+
+df = pd.read_csv('data/AAPL_2025.csv')
+df</textarea>
+        <div class="cell-output" id="output-cell-s1-1a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+
+df = pd.read_csv('data/AAPL_2025.csv')
+df</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Load just two columns at once</h3>
+      </div>
+      <p class="exercise-desc"><code>read_csv()</code> has a parameter called <code>usecols</code> where you can pass a list of column names to only load those columns. Try loading just <code>"Date"</code> and <code>"Close"</code>. Store it in <code>df_small</code> and display it.</p>
+      <div class="cell" id="cell-s1-1b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-1b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-1b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# Load only the Date and Close columns
+df_small = pd.read_csv('data/AAPL_2025.csv', usecols=[...])
+df_small"># Load only the Date and Close columns
+df_small = pd.read_csv('data/AAPL_2025.csv', usecols=[...])
+df_small</textarea>
+        <div class="cell-output" id="output-cell-s1-1b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df_small = pd.read_csv('data/AAPL_2025.csv', usecols=['Date', 'Close'])
+df_small</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Exploring ── -->
+  <div class="lesson" id="s1-explore">
+    <h2>🔍 Exploring the DataFrame</h2>
+    <div class="concept-box">
+      <p>Before analysing data, always get a feel for what you're working with. Pandas gives you three handy tools:</p>
+      <p>• <code>df.info()</code> — shows each column, its <strong>data type</strong> (int, float, object…), and how many values are non-null<br>
+      • <code>df.shape</code> — returns a tuple <code>(rows, columns)</code><br>
+      • <code>display(df)</code> — forces the full table to print even when it's not the last line of code</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Inspect the DataFrame</h3>
+      </div>
+      <p class="exercise-desc">Run <code>df.info()</code> to see column types, then check <code>df.shape</code> to confirm how many rows and columns there are. (You need to have run the loading cell above first!)</p>
+      <div class="cell" id="cell-s1-2a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-2a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-2a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df.info()">df.info()</textarea>
+        <div class="cell-output" id="output-cell-s1-2a"></div>
+      </div>
+      <div class="cell" id="cell-s1-2b" style="margin-top:8px">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-2b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-2b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df.shape">df.shape</textarea>
+        <div class="cell-output" id="output-cell-s1-2b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df.info()
+# then in another cell:
+df.shape</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>How many high-volume days?</h3>
+      </div>
+      <p class="exercise-desc">Use <code>df["Volume"]</code> to access the Volume column, then filter it and use <code>.sum()</code> to count the number of trading days where Volume exceeded 100,000,000. (Hint: booleans like <code>True/False</code> count as 1/0 in arithmetic.)</p>
+      <div class="cell" id="cell-s1-2c">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-2c')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-2c')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# Count days where volume > 100 million
+(df['Volume'] > ...).sum()"># Count days where volume > 100 million
+(df['Volume'] > ...).sum()</textarea>
+        <div class="cell-output" id="output-cell-s1-2c"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>(df['Volume'] > 100_000_000).sum()</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Accessing ── -->
+  <div class="lesson" id="s1-access">
+    <h2>🎯 Accessing Columns and Rows</h2>
+    <div class="concept-box">
+      <p><strong>Selecting one column:</strong> <code>df["Close"]</code> — returns a <em>Series</em> (a single column). Think of it like selecting one column in Excel.</p>
+      <p><strong>Selecting multiple columns:</strong> <code>df[["Date", "Close", "Volume"]]</code> — pass a <em>list</em> inside the brackets. The double brackets are intentional!</p>
+      <p><strong>Accessing rows:</strong> <code>df.head(8)</code> returns the first 8 rows. <code>df.tail(5)</code> returns the last 5. You can chain these: <code>df.head(8)[["Date", "Close"]]</code> first takes 8 rows, then selects columns.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Quick Peek</span>
+        <h3>First 8 trading days</h3>
+      </div>
+      <p class="exercise-desc">Display the <code>Date</code>, <code>Close</code>, and <code>Volume</code> columns for only the first 8 days of trading. Chain <code>.head(8)</code> with column selection.</p>
+      <div class="cell" id="cell-s1-3a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-3a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-3a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE
+display(df.head(...)[['Date', '...', '...']])"># YOUR CODE HERE
+display(df.head(...)[['Date', '...', '...']])</textarea>
+        <div class="cell-output" id="output-cell-s1-3a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>display(df.head(8)[['Date', 'Close', 'Volume']])</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Last 5 trading days</h3>
+      </div>
+      <p class="exercise-desc">Display the <code>Date</code>, <code>Open</code>, <code>High</code>, and <code>Low</code> columns for the last 5 days. Use <code>.tail()</code> instead of <code>.head()</code>.</p>
+      <div class="cell" id="cell-s1-3b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-3b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-3b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-3b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>display(df.tail(5)[['Date', 'Open', 'High', 'Low']])</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Filtering ── -->
+  <div class="lesson" id="s1-filter">
+    <h2>🔎 Filtering with Boolean Masks</h2>
+    <div class="concept-box">
+      <p>A <strong>mask</strong> is just a list of <code>True/False</code> values — one per row. When you write <code>df["Volume"] > 150_000_000</code>, pandas checks each row and returns <code>True</code> if that row's Volume exceeds 150M, <code>False</code> otherwise.</p>
+      <p>Then you pass the mask back into <code>df[mask]</code> and pandas returns only the <code>True</code> rows. You can store the mask first or do it in one line.</p>
+      <p>You can also compare strings: since dates are stored as <code>"YYYY-MM-DD"</code> strings, comparisons like <code>df["Date"] &gt;= "2025-12-01"</code> work alphabetically — and luckily, alphabetical and chronological order match for that format!</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · End of Year</span>
+        <h3>All of December 2025</h3>
+      </div>
+      <p class="exercise-desc">Create a mask that is <code>True</code> for all rows where the Date is on or after December 1st, 2025. Then use that mask to display all December trading days.</p>
+      <div class="cell" id="cell-s1-4a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-4a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-4a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="mask = df['Date'] >= '...'
+df[mask]">mask = df['Date'] >= '...'
+df[mask]</textarea>
+        <div class="cell-output" id="output-cell-s1-4a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>mask = df['Date'] >= '2025-12-01'
+df[mask]</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>All of January 2025</h3>
+      </div>
+      <p class="exercise-desc">Display all trading days in January 2025. You need two conditions: Date ≥ January 1st AND Date ≤ January 31st. Combine them with <code>&amp;</code> (the "and" operator for pandas): <code>(condition1) &amp; (condition2)</code>. The parentheses are required!</p>
+      <div class="cell" id="cell-s1-4b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-4b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-4b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-4b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>mask = (df['Date'] >= '2025-01-01') & (df['Date'] <= '2025-01-31')
+df[mask]</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Big Days</span>
+        <h3>High-volume trading days</h3>
+      </div>
+      <p class="exercise-desc">Display all rows where the trading Volume exceeded 150,000,000. Tip: Python lets you write big numbers with underscores for readability: <code>150_000_000</code>.</p>
+      <div class="cell" id="cell-s1-5a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-5a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-5a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-5a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>mask = df['Volume'] > 150_000_000
+df[mask]</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Big price AND big volume days</h3>
+      </div>
+      <p class="exercise-desc">Display days where the Close price was above 240 AND Volume was above 80,000,000. Use <code>&amp;</code> to combine both conditions. How many days does this return?</p>
+      <div class="cell" id="cell-s1-5b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-5b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-5b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-5b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>mask = (df['Close'] > 240) & (df['Volume'] > 80_000_000)
+df[mask]</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Index ── -->
+  <div class="lesson" id="s1-index">
+    <h2>📅 Setting the Date as Index</h2>
+    <div class="concept-box">
+      <p>By default, a DataFrame is indexed 0, 1, 2, 3… But for time series data, it makes much more sense to use the date as the index. This lets us do things like <code>df.loc["2025-12"]</code> to get all of December in one line.</p>
+      <p><strong>Step 1:</strong> Convert the "Date" column from a plain string to a proper <strong>datetime object</strong> using <code>pd.to_datetime()</code>. This tells pandas "these are actual dates, not just text".<br>
+      <strong>Step 2:</strong> Set the Date column as the index using <code>df.set_index("Date")</code>. We overwrite <code>df</code> with the result.</p>
+    </div>
+    <div class="tip-box">
+      <span class="tip-icon">💡</span>
+      <span>After setting the index, <code>df.loc["2025-12"]</code> uses <strong>label-based indexing</strong> — selecting by the date label, not by row number. Partial strings like <code>"2025-12"</code> match all dates in December 2025.</span>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Convert and set the Date index</h3>
+      </div>
+      <p class="exercise-desc">Convert the <code>Date</code> column to a datetime, then set it as the index. Display the result to confirm the index is now a date.</p>
+      <div class="cell" id="cell-s1-6a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-6a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-6a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df['Date'] = pd.to_datetime(df['Date'])
+df = df.set_index('Date')
+df">df['Date'] = pd.to_datetime(df['Date'])
+df = df.set_index('Date')
+df</textarea>
+        <div class="cell-output" id="output-cell-s1-6a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['Date'] = pd.to_datetime(df['Date'])
+df = df.set_index('Date')
+df</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Access a full quarter with .loc</h3>
+      </div>
+      <p class="exercise-desc">With the datetime index set, use <code>df.loc["2025-04":"2025-06"]</code> to retrieve all of Q2 (April through June). The colon means "from ... to ...".</p>
+      <div class="cell" id="cell-s1-6b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-6b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-6b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# Get all of Q2 2025 (run the indexing cell above first!)
+df.loc[...:...]"># Get all of Q2 2025 (run the indexing cell above first!)
+df.loc[...:...]</textarea>
+        <div class="cell-output" id="output-cell-s1-6b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df.loc['2025-04':'2025-06']</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Aggregations ── -->
+  <div class="lesson" id="s1-agg">
+    <h2>📐 Aggregations</h2>
+    <div class="concept-box">
+      <p>Aggregations <strong>collapse many values into one summary number</strong>. Examples: <code>df["Close"].mean()</code> gives the average closing price, <code>df["Volume"].max()</code> gives the single highest volume day.</p>
+      <p>The clever trick: a boolean mask is just a column of <code>True</code> and <code>False</code>. Since <code>True == 1</code> and <code>False == 0</code>, calling <code>.sum()</code> on a mask counts how many rows are <code>True</code>. And to narrow a mask to a specific period, you can filter the mask's index: <code>mask.index.to_period("Q")</code> converts each date to its quarter label like <code>"2025Q3"</code>.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Apple Quarters</span>
+        <h3>Q3 vs Q4: above-average close days</h3>
+      </div>
+      <p class="exercise-desc">Did Q3 or Q4 2025 have more trading days where <code>Close</code> was above the annual average? Create a mask for above-average close, then count how many days in Q3 and Q4 satisfy it.</p>
+      <div class="cell" id="cell-s1-7a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-7a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-7a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# Create a mask for days where Close > annual mean
+mask = df['Close'] > df['Close'].mean()
+
+# Filter to Q3 and count
+q3 = mask[mask.index.to_period('Q') == '2025Q3'].sum()
+# Filter to Q4 and count
+q4 = mask[mask.index.to_period('Q') == '2025Q4'].sum()
+
+print(f'Q3 above-average days: {q3}')
+print(f'Q4 above-average days: {q4}')"># Create a mask for days where Close > annual mean
+mask = df['Close'] > df['Close'].mean()
+
+# Filter to Q3 and count
+q3 = mask[mask.index.to_period('Q') == '2025Q3'].sum()
+# Filter to Q4 and count
+q4 = mask[mask.index.to_period('Q') == '2025Q4'].sum()
+
+print(f'Q3 above-average days: {q3}')
+print(f'Q4 above-average days: {q4}')</textarea>
+        <div class="cell-output" id="output-cell-s1-7a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>mask = df['Close'] > df['Close'].mean()
+q3 = mask[mask.index.to_period('Q') == '2025Q3'].sum()
+q4 = mask[mask.index.to_period('Q') == '2025Q4'].sum()
+print(f'Q3 above-average days: {q3}')
+print(f'Q4 above-average days: {q4}')</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Which month had the highest average Close?</h3>
+      </div>
+      <p class="exercise-desc">Use <code>df.groupby(df.index.month)["Close"].mean()</code> to get the average closing price for each month (1 = Jan, 12 = Dec). Then use <code>.idxmax()</code> to find which month number had the highest average.</p>
+      <div class="cell" id="cell-s1-7b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-7b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-7b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-7b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>monthly_avg = df.groupby(df.index.month)['Close'].mean()
+print(monthly_avg)
+print(f'\nBest month: {monthly_avg.idxmax()} (avg: ${monthly_avg.max():.2f})')</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · March Madness</span>
+        <h3>March summary statistics</h3>
+      </div>
+      <p class="exercise-desc">Looking only at March 2025, find: the first <em>opening</em> price of the month, the last <em>closing</em> price, and the total volume traded. Use <code>df.loc["2025-03"]</code>, then <code>.iloc[0]</code> and <code>.iloc[-1]</code> to access first and last rows.</p>
+      <div class="cell" id="cell-s1-8a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-8a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-8a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-8a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>march = df.loc['2025-03']
+print(f"First open:    ${march['Open'].iloc[0]:.2f}")
+print(f"Last close:    ${march['Close'].iloc[-1]:.2f}")
+print(f"Total volume:  {march['Volume'].sum():,.0f}")</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>January vs December: which had more volume?</h3>
+      </div>
+      <p class="exercise-desc">Compare the <em>average daily volume</em> in January 2025 vs December 2025. Use <code>df.loc["2025-01"]["Volume"].mean()</code> and the same for December. Which month was more actively traded?</p>
+      <div class="cell" id="cell-s1-8b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s1-8b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s1-8b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s1-8b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>jan_vol = df.loc['2025-01']['Volume'].mean()
+dec_vol = df.loc['2025-12']['Volume'].mean()
+print(f'Jan avg volume: {jan_vol:,.0f}')
+print(f'Dec avg volume: {dec_vol:,.0f}')
+winner = 'January' if jan_vol > dec_vol else 'December'
+print(f'\n{winner} was more actively traded.')</pre></div>
+      </details>
+    </div>
+  </div>
+
+</div><!-- /sec-s1 -->
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 2a                  ║ -->
+<!-- ╚══════════════════════════════╝ -->
+<div class="page-section" id="sec-s2a">
+
+  <div class="session-hero">
+    <div class="hero-num">2a</div>
+    <div>
+      <h1>Data Cleaning</h1>
+      <p>Real-world financial data is messy — wrong order, duplicates, missing values, junk columns. This session teaches you how to diagnose and fix each issue systematically using pandas.</p>
+    </div>
+  </div>
+
+  <!-- ── Intro ── -->
+  <div class="lesson" id="s2a-intro">
+    <h2>🗂 Why Data Cleaning?</h2>
+    <div class="concept-box">
+      <p>Data scientists spend <strong>60–80% of their time cleaning data</strong>, not analysing it. Raw data downloaded from financial APIs often has: dates out of order, duplicate rows, missing prices, and columns you never asked for (like dividends when you only care about price).</p>
+      <p>This session uses <code>AAPL_2026_raw.csv</code> — a deliberately messy version of Apple's 2026 data. Your job is to detect the problems and fix them one by one.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Load the raw data</h3>
+      </div>
+      <p class="exercise-desc">Load <code>data/AAPL_2026_raw.csv</code> into a DataFrame called <code>df_raw</code>. Display it, then run <code>df_raw.info()</code> in the next cell. Notice anything suspicious?</p>
+      <div class="cell" id="cell-s2-1a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-1a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-1a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+
+df_raw = pd.read_csv('data/AAPL_2026_raw.csv')
+df_raw">import pandas as pd
+
+df_raw = pd.read_csv('data/AAPL_2026_raw.csv')
+df_raw</textarea>
+        <div class="cell-output" id="output-cell-s2-1a"></div>
+      </div>
+      <div class="cell" id="cell-s2-1b" style="margin-top:8px">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-1b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-1b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df_raw.info()">df_raw.info()</textarea>
+        <div class="cell-output" id="output-cell-s2-1b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+df_raw = pd.read_csv('data/AAPL_2026_raw.csv')
+df_raw
+# then:
+df_raw.info()</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Inspect ── -->
+  <div class="lesson" id="s2a-inspect">
+    <h2>🔬 Inspecting for Problems</h2>
+    <div class="concept-box">
+      <p>To count missing values in every column at once, chain two methods: <code>df.isnull()</code> creates a DataFrame of <code>True/False</code> (True = missing), then <code>.sum()</code> adds up the Trues in each column. This is called <strong>method chaining</strong>.</p>
+      <p>Common problems to look for: <strong>Non-null count &lt; total rows</strong> means missing values. <strong>Columns you don't need</strong> (Dividends, Stock Splits) waste memory. <strong>Dates unsorted or duplicated</strong> will break time-series calculations.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Some Null Chain</span>
+        <h3>Count missing values per column</h3>
+      </div>
+      <p class="exercise-desc">Chain <code>.isnull()</code>, <code>.sum()</code>, and <code>.sum()</code> again on <code>df_raw</code> to get a <strong>single total number</strong> of missing values across the whole DataFrame. The first <code>.sum()</code> gives per-column counts; the second <code>.sum()</code> adds those up into one number.</p>
+      <div class="cell" id="cell-s2-2a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-2a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-2a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df_raw.isnull().sum().sum()">df_raw.isnull().sum().sum()</textarea>
+        <div class="cell-output" id="output-cell-s2-2a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df_raw.isnull().sum().sum()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>What percentage of each column is missing?</h3>
+      </div>
+      <p class="exercise-desc">Divide <code>df_raw.isnull().sum()</code> by <code>len(df_raw)</code> and multiply by 100 to get the percentage of missing values per column. Round to 2 decimal places with <code>.round(2)</code>.</p>
+      <div class="cell" id="cell-s2-2b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-2b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-2b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2-2b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>(df_raw.isnull().sum() / len(df_raw) * 100).round(2)</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Sort + Dedup ── -->
+  <div class="lesson" id="s2a-sort">
+    <h2>🔄 Sorting and Removing Duplicates</h2>
+    <div class="concept-box">
+      <p><strong>Why sort?</strong> If dates are out of order, any "rolling" calculation (like a moving average) will be wrong. We first set the date as the index (<code>set_index("Date")</code>), convert it to datetime, then sort it (<code>sort_index()</code>).</p>
+      <p><strong>Why remove duplicates?</strong> If the same date appears twice, averages and sums will be inflated. <code>drop_duplicates()</code> keeps the first occurrence and removes the rest. We can chain this with sorting in one expression.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Sort by date and drop duplicates</h3>
+      </div>
+      <p class="exercise-desc">The Date column uses <strong>day-first format</strong> (DD/MM/YYYY), so you must tell pandas <code>dayfirst=True</code> when converting. Then set it as the index using <code>set_index("Date", inplace=True)</code>, sort with <code>sort_index(inplace=True)</code>, and drop duplicates. Store the cleaned result in <code>df</code>.</p>
+      <div class="cell" id="cell-s2-3a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-3a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-3a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df = df_raw.copy()
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+df.set_index('Date', inplace=True)
+df.sort_index(inplace=True)
+df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+df.drop_duplicates(inplace=True)
+
+print(f'Raw rows:    {len(df_raw)}')
+print(f'Clean rows:  {len(df)}')
+df">df = df_raw.copy()
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+df.set_index('Date', inplace=True)
+df.sort_index(inplace=True)
+df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+df.drop_duplicates(inplace=True)
+
+print(f'Raw rows:    {len(df_raw)}')
+print(f'Clean rows:  {len(df)}')
+df</textarea>
+        <div class="cell-output" id="output-cell-s2-3a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df = df_raw.copy()
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+df.set_index('Date', inplace=True)
+df.sort_index(inplace=True)
+df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+df.drop_duplicates(inplace=True)
+print(f'Removed {len(df_raw) - len(df)} duplicate rows')
+df</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Confirm the index is sorted</h3>
+      </div>
+      <p class="exercise-desc">After sorting, verify by checking <code>df.index.is_monotonic_increasing</code> — this should return <code>True</code>. Also check <code>df.index.duplicated().sum()</code> to confirm zero duplicate index entries remain.</p>
+      <div class="cell" id="cell-s2-3b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-3b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-3b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2-3b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>print(f'Sorted:     {df.index.is_monotonic_increasing}')
+print(f'Duplicates: {df.index.duplicated().sum()}')</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Drop ── -->
+  <div class="lesson" id="s2a-drop">
+    <h2>🗑 Dropping Unnecessary Columns</h2>
+    <div class="concept-box">
+      <p>Financial data from APIs often includes columns you didn't ask for — like <code>Dividends</code> and <code>Stock Splits</code>. These add noise and memory usage. <code>df.drop(columns=["col1", "col2"])</code> removes them.</p>
+      <p>As always, you need to assign the result back: <code>df = df.drop(columns=[...])</code>. Or you can add the cleaning step into your chain from the previous exercise.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Verify your clean DataFrame</h3>
+      </div>
+      <p class="exercise-desc">After the cleaning steps above, confirm the result: run <code>df.info()</code> to verify the columns are correct (Open, High, Low, Close, Volume only), the index is a DatetimeIndex, and no junk columns remain.</p>
+      <div class="cell" id="cell-s2-4a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-4a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-4a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df.info()">df.info()</textarea>
+        <div class="cell-output" id="output-cell-s2-4a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df.info()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Check what remains</h3>
+      </div>
+      <p class="exercise-desc">Use <code>df.dtypes</code> to inspect the data type of each remaining column. All price columns should be <code>float64</code>. Volume is often <code>float64</code> too (it becomes an integer later). Are there any unexpected types?</p>
+      <div class="cell" id="cell-s2-4b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-4b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-4b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df.dtypes">df.dtypes</textarea>
+        <div class="cell-output" id="output-cell-s2-4b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Missing ── -->
+  <div class="lesson" id="s2a-missing">
+    <h2>🩹 Handling Missing Values</h2>
+    <div class="concept-box">
+      <p>Different columns need different fill strategies depending on what the value means:</p>
+      <p>• <strong>Close</strong> → <code>ffill().bfill()</code>: forward fill first (yesterday's close), then backward fill as a safety net if the very first row is NaN.<br>
+      • <strong>Volume</strong> → <code>fillna(df["Volume"].median())</code>: use the median volume. Volume can vary wildly, so median is safer than mean.<br>
+      • <strong>Open</strong> → <code>interpolate()</code>: linearly interpolate between the surrounding values.<br>
+      • <strong>High</strong> → <code>df[["Close","Open"]].max(axis=1)</code>: High must be at least the max of Open and Close.<br>
+      • <strong>Low</strong> → <code>High * 0.97</code>: assume Low was 3% below High.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Cleaning Up</span>
+        <h3>Fix each column's missing values</h3>
+      </div>
+      <p class="exercise-desc">Apply the appropriate fill strategy to each column. After filling, verify with <code>df.isnull().sum()</code> that all missing values are gone.</p>
+      <div class="cell" id="cell-s2-5a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-5a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-5a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# Close: ffill then bfill (handles NaN at the very first row too)
+df['Close'] = df['Close'].ffill().bfill()
+
+# Volume: fill with median
+df['Volume'] = df['Volume'].fillna(df['Volume'].median())
+
+# Open: linear interpolation
+df['Open'] = df['Open'].interpolate(method='linear')
+
+# High: max of Close and Open
+df['High'] = df['High'].fillna(df[['Close', 'Open']].max(axis=1))
+
+# Low: 3% below High
+df['Low'] = df['Low'].fillna(df['High'] * 0.97)
+
+# Verify
+df.isnull().sum()"># Close: ffill then bfill (handles NaN at the very first row too)
+df['Close'] = df['Close'].ffill().bfill()
+
+# Volume: fill with median
+df['Volume'] = df['Volume'].fillna(df['Volume'].median())
+
+# Open: linear interpolation
+df['Open'] = df['Open'].interpolate(method='linear')
+
+# High: max of Close and Open
+df['High'] = df['High'].fillna(df[['Close', 'Open']].max(axis=1))
+
+# Low: 3% below High
+df['Low'] = df['Low'].fillna(df['High'] * 0.97)
+
+# Verify
+df.isnull().sum()</textarea>
+        <div class="cell-output" id="output-cell-s2-5a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['Close'] = df['Close'].ffill().bfill()
+df['Volume'] = df['Volume'].fillna(df['Volume'].median())
+df['Open'] = df['Open'].interpolate(method='linear')
+df['High'] = df['High'].fillna(df[['Close', 'Open']].max(axis=1))
+df['Low'] = df['Low'].fillna(df['High'] * 0.97)
+df.isnull().sum()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Try bfill instead of ffill for Close</h3>
+      </div>
+      <p class="exercise-desc">Reload the data from scratch (<code>df_raw</code>) and this time use <code>bfill()</code> (backward fill — uses tomorrow's value) for Close instead of <code>ffill()</code>. Compare which approach makes more financial sense for a missing closing price. (Reset <code>df</code> first using the cells above.)</p>
+      <div class="cell" id="cell-s2-5b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-5b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-5b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# Demonstrate bfill on Close
+_d = df_raw.copy()
+_d['Date'] = pd.to_datetime(_d['Date'], dayfirst=True)
+test = _d.set_index('Date').sort_index().drop_duplicates()
+test = test.drop(columns=['Dividends', 'Stock Splits'])
+
+# Show a row with missing Close, then compare ffill vs bfill
+missing_dates = test[test['Close'].isnull()].index
+print('Missing Close dates:', missing_dates[:3].tolist())
+
+# bfill fills from the NEXT known value
+test['Close_bfill'] = test['Close'].bfill()
+test['Close_ffill'] = test['Close'].ffill()
+test.loc[missing_dates[:3], ['Close_bfill', 'Close_ffill']]"># Demonstrate bfill on Close
+_d = df_raw.copy()
+_d['Date'] = pd.to_datetime(_d['Date'], dayfirst=True)
+test = _d.set_index('Date').sort_index().drop_duplicates()
+test = test.drop(columns=['Dividends', 'Stock Splits'])
+
+# Show a row with missing Close, then compare ffill vs bfill
+missing_dates = test[test['Close'].isnull()].index
+print('Missing Close dates:', missing_dates[:3].tolist())
+
+# bfill fills from the NEXT known value
+test['Close_bfill'] = test['Close'].bfill()
+test['Close_ffill'] = test['Close'].ffill()
+test.loc[missing_dates[:3], ['Close_bfill', 'Close_ffill']]</textarea>
+        <div class="cell-output" id="output-cell-s2-5b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># ffill uses yesterday's close → more common in finance (last known price)
+# bfill uses tomorrow's close → introduces "look-ahead bias" (you wouldn't know this yet!)
+# For backtesting and fair financial analysis, ffill is safer.</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Types ── -->
+  <div class="lesson" id="s2a-types">
+    <h2>🔢 Casting Data Types</h2>
+    <div class="concept-box">
+      <p>After filling missing values, Volume is stored as <code>float64</code> (decimal numbers). But volume is always a whole number — you can't trade 1.5 shares. We can <strong>cast</strong> it to <code>int64</code> using <code>.astype(int)</code>.</p>
+      <p><strong>Important:</strong> You can only cast to <code>int</code> after all missing values are filled. If any <code>NaN</code> remains, the cast will fail — integers can't store NaN in pandas.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Cast Volume to integer</h3>
+      </div>
+      <p class="exercise-desc">Convert the <code>Volume</code> column from <code>float64</code> to <code>int64</code> using <code>.astype(int)</code>. Confirm the type changed with <code>df["Volume"].dtype</code>.</p>
+      <div class="cell" id="cell-s2-6a">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-6a')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-6a')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="df['Volume'] = df['Volume'].astype('int64')
+print(df['Volume'].dtype)
+df.head()">df['Volume'] = df['Volume'].astype('int64')
+print(df['Volume'].dtype)
+df.head()</textarea>
+        <div class="cell-output" id="output-cell-s2-6a"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['Volume'] = df['Volume'].astype('int64')
+print(df['Volume'].dtype)
+df.head()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Save the clean data to a file</h3>
+      </div>
+      <p class="exercise-desc">Use <code>df.to_csv("data/AAPL_2026_clean.csv")</code> to save the cleaned DataFrame. Then reload it with <code>pd.read_csv()</code> and compare <code>df_reload.info()</code> — notice anything about the Date index after reloading?</p>
+      <div class="cell" id="cell-s2-6b">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-6b')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-6b')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import io
+
+# Save to a virtual CSV string (simulates writing to disk)
+csv_str = df.to_csv()
+df_reload = pd.read_csv(io.StringIO(csv_str), index_col='Date', parse_dates=True)
+print('Reloaded shape:', df_reload.shape)
+df_reload.info()">import io
+
+# Save to a virtual CSV string (simulates writing to disk)
+csv_str = df.to_csv()
+df_reload = pd.read_csv(io.StringIO(csv_str), index_col='Date', parse_dates=True)
+print('Reloaded shape:', df_reload.shape)
+df_reload.info()</textarea>
+        <div class="cell-output" id="output-cell-s2-6b"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># Notice: when reloading, use index_col='Date' and parse_dates=True
+# to restore the datetime index correctly.
+# Without these, Date becomes a plain text column again!</pre></div>
+      </details>
+    </div>
+  </div>
+
+</div><!-- /sec-s2a -->
+
+</main>
+
+<!-- ── AI PANEL ── -->
+<aside id="ai-panel" class="no-key">
+  <div class="ai-header">
+    <span>🤖</span>
+    <h4>AI Tutor</h4>
+    <div style="flex:1"></div>
+    <button class="ai-close" onclick="toggleAI()">✕</button>
+  </div>
+
+  <div class="api-setup" id="api-setup-area">
+    <p>Connect your own AI. Your key is stored only in this tab — never sent to any server.</p>
+    <div class="api-row">
+      <select class="api-select" id="api-provider">
+        <option value="openai">ChatGPT</option>
+        <option value="anthropic">Claude</option>
+      </select>
+      <input class="api-input" type="password" id="api-key-input" placeholder="sk-... or sk-ant-...">
+    </div>
+    <button class="api-save" onclick="saveApiKey()">Connect →</button>
+    <div class="api-saved" id="api-saved-row" style="display:none">
+      <div class="api-saved-dot"></div>
+      <span class="api-saved-text" id="api-saved-label">Connected</span>
+      <button class="api-change-btn" onclick="changeApiKey()">Change</button>
+    </div>
+  </div>
+
+  <div id="ai-messages">
+    <div class="ai-welcome">
+      <div class="wi">🎓</div>
+      <strong>Your Python Tutor</strong>
+      Connect your API key above, then ask anything about the exercises. I can explain concepts, debug your code, and suggest improvements — and you can apply my code suggestions directly to your cell.
+    </div>
+  </div>
+
+  <div class="ai-input-row">
+    <textarea id="ai-input" placeholder="Ask about the code…" rows="1"
+      onkeydown="handleAIKey(event)" oninput="autoGrow(this)"></textarea>
+    <button class="ai-send-btn" onclick="sendAIMessage()" id="ai-send">↑</button>
+  </div>
+  <div class="ai-context-note" id="ai-ctx-note">Active cell: <em id="active-cell-label">none</em></div>
+</aside>
+
+</div><!-- /layout -->
+</div><!-- /app -->
+
+<button id="ai-toggle" onclick="toggleAI()" title="Open AI Tutor">🤖</button>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  State
+// ══════════════════════════════════════════════════════
+let pyodide = null;
+let activeCell = null;
+let activeCellId = null;
+let aiHistory = [];
+let apiKey = '';
+let apiProvider = 'openai';
+
+// ══════════════════════════════════════════════════════
+//  Pyodide Init
+// ══════════════════════════════════════════════════════
+const PYODIDE_INIT = `
+import sys, io, base64
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from io import StringIO
+
+# ── Matplotlib capture ──────────────────────────────
+def _capture_show(*args, **kwargs):
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=120, bbox_inches='tight', facecolor='#0D1117')
+    buf.seek(0)
+    b64 = base64.b64encode(buf.read()).decode()
+    buf.close()
+    plt.clf()
+    print(f'__IMG__{b64}__IMG__')
+plt.show = _capture_show
+
+# ── display() like Jupyter ───────────────────────────
+import builtins
+def display(obj):
+    if isinstance(obj, (pd.DataFrame, pd.Series)):
+        print(obj.to_string())
+    else:
+        print(repr(obj))
+builtins.display = display
+
+# ── AAPL 2025 data ───────────────────────────────────
+np.random.seed(2025)
+_dates25 = pd.date_range('2025-01-02', '2025-12-31', freq='B')
+_n25 = len(_dates25)
+_price = 222.0
+_rets = np.random.normal(0.00035, 0.013, _n25)
+_closes = _price * np.cumprod(1 + _rets)
+_opens = _closes * (1 + np.random.normal(0, 0.004, _n25))
+_highs = np.maximum(_opens, _closes) * (1 + np.abs(np.random.normal(0, 0.007, _n25)))
+_lows = np.minimum(_opens, _closes) * (1 - np.abs(np.random.normal(0, 0.007, _n25)))
+_vols = (70_000_000 + np.random.exponential(55_000_000, _n25)).astype(int)
+_big = np.random.choice(_n25, 18, replace=False)
+_vols[_big] = (_vols[_big] * 2.8).astype(int)
+
+_df25 = pd.DataFrame({
+    'Date': _dates25.strftime('%Y-%m-%d'),
+    'Open': np.round(_opens, 2),
+    'High': np.round(_highs, 2),
+    'Low': np.round(_lows, 2),
+    'Close': np.round(_closes, 2),
+    'Volume': _vols.astype(float)
+})
+_csv25 = _df25.to_csv(index=False)
+
+# ── AAPL 2026 raw (messy) ────────────────────────────
+np.random.seed(2026)
+_dates26 = pd.date_range('2026-01-02', '2026-06-30', freq='B')
+_n26 = len(_dates26)
+_p26 = _closes[-1]
+_r26 = np.random.normal(0.0003, 0.013, _n26)
+_c26 = _p26 * np.cumprod(1 + _r26)
+_o26 = _c26 * (1 + np.random.normal(0, 0.004, _n26))
+_h26 = np.maximum(_o26, _c26) * (1 + np.abs(np.random.normal(0, 0.007, _n26)))
+_l26 = np.minimum(_o26, _c26) * (1 - np.abs(np.random.normal(0, 0.007, _n26)))
+_v26 = (65_000_000 + np.random.exponential(50_000_000, _n26)).astype(int)
+
+_df26 = pd.DataFrame({
+    'Date': _dates26.strftime('%d/%m/%Y'),
+    'Open': np.round(_o26, 2),
+    'High': np.round(_h26, 2),
+    'Low': np.round(_l26, 2),
+    'Close': np.round(_c26, 2),
+    'Volume': _v26.astype(float),
+    'Dividends': 0.0,
+    'Stock Splits': 0.0,
+})
+
+# Introduce problems:
+# 1. Shuffle some rows (out of order)
+_swap = np.random.choice(_n26, 12, replace=False)
+_df26.iloc[_swap] = _df26.iloc[_swap[::-1]].values
+
+# 2. Add duplicates (3 random rows duplicated)
+_dup_idx = np.random.choice(_n26, 3, replace=False)
+_dups = _df26.iloc[_dup_idx].copy()
+_df26 = pd.concat([_df26, _dups]).reset_index(drop=True)
+
+# 3. Insert missing values
+_missing_close = np.random.choice(len(_df26), 4, replace=False)
+_missing_vol   = np.random.choice(len(_df26), 3, replace=False)
+_missing_open  = np.random.choice(len(_df26), 3, replace=False)
+_missing_high  = np.random.choice(len(_df26), 2, replace=False)
+_missing_low   = np.random.choice(len(_df26), 2, replace=False)
+_df26.loc[_missing_close, 'Close'] = np.nan
+_df26.loc[_missing_vol,   'Volume'] = np.nan
+_df26.loc[_missing_open,  'Open'] = np.nan
+_df26.loc[_missing_high,  'High'] = np.nan
+_df26.loc[_missing_low,   'Low'] = np.nan
+
+_csv26 = _df26.to_csv(index=False)
+
+# ── Patch pd.read_csv ────────────────────────────────
+_orig_read_csv = pd.read_csv
+_csv_store = {
+    'data/AAPL_2025.csv': _csv25,
+    'data/AAPL_2026_raw.csv': _csv26,
+}
+def _read_csv(path, **kw):
+    if isinstance(path, str) and path in _csv_store:
+        return _orig_read_csv(StringIO(_csv_store[path]), **kw)
+    return _orig_read_csv(path, **kw)
+pd.read_csv = _read_csv
+
+print('✓ Python ready — datasets loaded')
+`;
+
+function setStatus(msg) {
+  document.getElementById('status-text').textContent = msg;
+}
+
+async function initPyodide() {
+  try {
+    setStatus('Loading Pyodide…');
+    // Load the Pyodide bootstrap script
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Failed to load Pyodide script. Check your internet connection.'));
+      document.head.appendChild(s);
+    });
+
+    setStatus('Starting Python…');
+    pyodide = await loadPyodide();
+
+    setStatus('Loading pandas & matplotlib…');
+    await pyodide.loadPackage(['pandas', 'numpy', 'matplotlib']);
+
+    setStatus('Setting up datasets…');
+    pyodide.runPython(PYODIDE_INIT);
+
+    document.getElementById('status-dot').classList.add('ready');
+    setStatus('Python ready');
+    document.querySelectorAll('.run-btn').forEach(b => b.disabled = false);
+
+  } catch(e) {
+    console.error('Pyodide init failed:', e);
+    setStatus('❌ ' + e.message);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  Cell Runner
+// ══════════════════════════════════════════════════════
+async function runCell(cellId) {
+  if (!pyodide) return;
+  const cell = document.getElementById(cellId);
+  const textarea = cell.querySelector('.code-input');
+  const outputDiv = document.getElementById('output-' + cellId);
+  const runBtn = cell.querySelector('.run-btn');
+
+  runBtn.disabled = true;
+  runBtn.textContent = '⏳';
+  outputDiv.innerHTML = '<div class="out-text" style="color:var(--text3)">Running…</div>';
+
+  const userCode = textarea.value;
+  // Pass code via globals (most reliable method in Pyodide)
+  pyodide.globals.set('_USER_CODE', userCode);
+
+  let output = '';
+  try {
+    await pyodide.runPythonAsync(`
+import sys, io, ast, traceback as _tb
+_buf = io.StringIO()
+_old_out = sys.stdout
+_old_err = sys.stderr
+sys.stdout = _buf
+sys.stderr = _buf
+try:
+    _lines = str(_USER_CODE).rstrip().split('\\n')
+    _last = ''
+    _last_idx = len(_lines)
+    for _i in range(len(_lines)-1, -1, -1):
+        _stripped = _lines[_i].strip()
+        if _stripped and not _stripped.startswith('#'):
+            _last = _stripped
+            _last_idx = _i
+            break
+    _body = '\\n'.join(_lines[:_last_idx])
+    _is_expr = False
+    if _last:
+        try:
+            ast.parse(_last, mode='eval')
+            _is_expr = True
+        except SyntaxError:
+            pass
+    _g = globals()
+    if _body.strip():
+        exec(compile(_body, '<cell>', 'exec'), _g)
+    if _last:
+        if _is_expr:
+            import pandas as _pd
+            import json as _json
+            _result = eval(compile(_last, '<cell>', 'eval'), _g)
+            if isinstance(_result, _pd.Series):
+                _result = _result.to_frame()
+            if isinstance(_result, _pd.DataFrame):
+                globals()['_LAST_DF'] = _result
+                _cols = [str(c) for c in _result.columns.tolist()]
+                _idx  = [str(i) for i in _result.index.tolist()]
+                _meta = _json.dumps({'rows': len(_result), 'cols': len(_cols), 'columns': _cols, 'index': _idx})
+                print(f'__DF__{_meta}__DF__')
+            elif _result is not None:
+                print(repr(_result))
+        else:
+            exec(compile(_last, '<cell>', 'exec'), _g)
+    import matplotlib.pyplot as _plt_check
+    if _plt_check.get_fignums():
+        _plt_check.show()
+        _plt_check.close('all')
+except Exception:
+    print(_tb.format_exc())
+finally:
+    sys.stdout = _old_out
+    sys.stderr = _old_err
+    globals()['_CELL_OUTPUT'] = _buf.getvalue()
+`);
+    output = pyodide.globals.get('_CELL_OUTPUT') || '';
+  } catch(e) {
+    output = 'Internal error: ' + String(e);
+  }
+
+  const errored = output.includes('Traceback (most recent call last)') || output.startsWith('Internal error');
+  renderOutput(output, outputDiv, errored);
+  runBtn.disabled = false;
+  runBtn.textContent = '▶ Run';
+  cell.querySelector('.cell-num').textContent = 'Out';
+}
+
+function renderOutput(text, div, errored) {
+  div.innerHTML = '';
+  if (!text.trim()) { div.innerHTML = '<div class="out-text" style="color:var(--text3);font-size:12px">No output.</div>'; return; }
+
+  // Split on image sentinels first, then DataFrame sentinels
+  const parts = text.split(/(__IMG__[^_]*__IMG__|__DF__[\s\S]*?__DF__)/);
+  parts.forEach(part => {
+    const imgMatch = part.match(/^__IMG__(.+)__IMG__$/);
+    const dfMatch  = part.match(/^__DF__([\s\S]+)__DF__$/);
+    if (imgMatch) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'out-img';
+      const img = document.createElement('img');
+      img.src = 'data:image/png;base64,' + imgMatch[1];
+      wrapper.appendChild(img);
+      div.appendChild(wrapper);
+    } else if (dfMatch) {
+      try {
+        const meta = JSON.parse(dfMatch[1]);
+        renderDataFrame(meta, div);
+      } catch(e) {
+        const el = document.createElement('div');
+        el.className = 'out-text';
+        el.textContent = part;
+        div.appendChild(el);
+      }
+    } else if (part.trim()) {
+      const el = document.createElement('div');
+      el.className = errored ? 'out-err' : 'out-text';
+      el.textContent = part.trimStart();
+      div.appendChild(el);
+    }
+  });
+}
+
+async function renderDataFrame(meta, div) {
+  const { rows, cols, columns } = meta;
+  const PAGE_SIZES = [5, 10, 20, 50, 100];
+  let pageSize = rows <= 5 ? rows : 5;
+  let page = 0;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'df-wrapper';
+
+  // Controls row
+  const controls = document.createElement('div');
+  controls.className = 'df-controls';
+
+  const info = document.createElement('span');
+  info.className = 'df-info';
+
+  const label = document.createElement('span');
+  label.className = 'df-page-label';
+  label.textContent = 'Rows per page:';
+
+  const sel = document.createElement('select');
+  sel.className = 'df-page-select';
+  PAGE_SIZES.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n; opt.textContent = n;
+    if (n === pageSize) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  const optAll = document.createElement('option');
+  optAll.value = rows; optAll.textContent = 'All';
+  sel.appendChild(optAll);
+
+  const nav = document.createElement('div');
+  nav.className = 'df-nav';
+  const prevBtn = document.createElement('button');
+  prevBtn.textContent = '← Prev';
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = 'Next →';
+  nav.appendChild(prevBtn);
+  nav.appendChild(nextBtn);
+
+  controls.appendChild(info);
+  controls.appendChild(label);
+  controls.appendChild(sel);
+  controls.appendChild(nav);
+
+  const scroll = document.createElement('div');
+  scroll.className = 'df-scroll';
+  const table = document.createElement('table');
+  table.className = 'df-table';
+
+  // Pre-build header (columns don't change across pages)
+  const thead = table.createTHead();
+  const hrow = thead.insertRow();
+  const th0 = document.createElement('th'); th0.textContent = ''; hrow.appendChild(th0);
+  columns.forEach(c => {
+    const th = document.createElement('th'); th.textContent = c; hrow.appendChild(th);
+  });
+  table.createTBody(); // placeholder tbody
+
+  scroll.appendChild(table);
+  wrapper.appendChild(controls);
+  wrapper.appendChild(scroll);
+  div.appendChild(wrapper);
+
+  async function fetchPage() {
+    const start = page * pageSize;
+    const end = Math.min(start + pageSize, rows);
+    info.textContent = `${rows.toLocaleString()} rows × ${cols} cols  |  showing ${start + 1}–${end}`;
+    prevBtn.disabled = (page === 0);
+    nextBtn.disabled = (end >= rows);
+
+    let parsed;
+    try {
+      // Store result in pyodide globals - runPythonAsync doesn't return if/else block values
+      await pyodide.runPythonAsync(`
+_df_s = globals().get('_LAST_DF')
+if _df_s is not None:
+    _sl = _df_s.iloc[${start}:${end}]
+    globals()['_DF_JSON'] = _sl.to_json(orient='split', date_format='iso', default_handler=str)
+else:
+    globals()['_DF_JSON'] = '{"columns":[],"index":[],"data":[]}'
+`);
+      const raw = pyodide.globals.get('_DF_JSON');
+      parsed = JSON.parse(raw);
+    } catch(e) {
+      const errEl = document.createElement('div');
+      errEl.className = 'out-err';
+      errEl.textContent = 'DataFrame display error: ' + String(e);
+      table.parentNode.replaceWith(errEl);
+      return;
+    }
+
+    const { data, index } = parsed;
+
+    // Rebuild tbody only
+    const oldTbody = table.tBodies[0];
+    const newTbody = document.createElement('tbody');
+    data.forEach((row, i) => {
+      const tr = newTbody.insertRow();
+      const tdIdx = tr.insertCell();
+      tdIdx.textContent = index[i] !== undefined ? index[i] : i;
+      row.forEach(v => {
+        const td = tr.insertCell();
+        if (typeof v === 'number' && !Number.isInteger(v)) {
+          td.textContent = v.toFixed(4);
+        } else if (v === null) {
+          td.textContent = 'NaN';
+          td.style.color = 'var(--text3)';
+        } else {
+          td.textContent = v;
+        }
+      });
+    });
+    table.replaceChild(newTbody, oldTbody);
+  }
+
+  sel.addEventListener('change', () => { pageSize = parseInt(sel.value); page = 0; fetchPage(); });
+  prevBtn.addEventListener('click', () => { if (page > 0) { page--; fetchPage(); } });
+  nextBtn.addEventListener('click', () => { if ((page + 1) * pageSize < rows) { page++; fetchPage(); } });
+
+  await fetchPage();
+}
+
+function resetCell(cellId) {
+  const cell = document.getElementById(cellId);
+  const textarea = cell.querySelector('.code-input');
+  textarea.value = textarea.dataset.default;
+  document.getElementById('output-' + cellId).innerHTML = '';
+  cell.querySelector('.cell-num').textContent = 'In [ ]';
+}
+
+function setActiveCell(textarea) {
+  activeCell = textarea;
+  // Find cell id
+  const cell = textarea.closest('.cell');
+  if (cell) {
+    activeCellId = cell.id;
+    const label = document.getElementById('active-cell-label');
+    if (label) label.textContent = cell.id.replace('cell-','');
+  }
+}
+
+// Tab = 4 spaces
+document.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && document.activeElement.classList.contains('code-input')) {
+    e.preventDefault();
+    const ta = document.activeElement;
+    const s = ta.selectionStart, en = ta.selectionEnd;
+    ta.value = ta.value.substring(0,s) + '    ' + ta.value.substring(en);
+    ta.selectionStart = ta.selectionEnd = s + 4;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && document.activeElement.classList.contains('code-input')) {
+    e.preventDefault();
+    const cell = document.activeElement.closest('.cell');
+    if (cell) runCell(cell.id);
+  }
+});
+
+// Disable run buttons until ready
+document.querySelectorAll('.run-btn').forEach(b => b.disabled = true);
+
+// ══════════════════════════════════════════════════════
+//  Navigation
+// ══════════════════════════════════════════════════════
+function nav(session, anchorId) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+
+  const secId = 'sec-' + session;
+  const sec = document.getElementById(secId);
+  if (sec) sec.classList.add('active');
+
+  if (anchorId) {
+    setTimeout(() => {
+      const el = document.getElementById(anchorId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+  event?.target?.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+//  Theme
+// ══════════════════════════════════════════════════════
+function toggleTheme() {
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme');
+  root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+}
+
+// ══════════════════════════════════════════════════════
+//  AI Panel
+// ══════════════════════════════════════════════════════
+function toggleAI() {
+  const panel = document.getElementById('ai-panel');
+  const btn = document.getElementById('ai-hdr-btn');
+  panel.classList.toggle('open');
+  btn.classList.toggle('active');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  const prov = document.getElementById('api-provider').value;
+  if (!key) return;
+  apiKey = key;
+  apiProvider = prov;
+
+  document.getElementById('api-saved-label').textContent =
+    (prov === 'openai' ? 'ChatGPT' : 'Claude') + ' connected';
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-saved-row').style.display = 'flex';
+  document.querySelector('#api-setup-area .api-row').style.display = 'none';
+  document.querySelector('#api-setup-area .api-save').style.display = 'none';
+  document.getElementById('ai-panel').classList.remove('no-key');
+}
+
+function changeApiKey() {
+  apiKey = '';
+  document.getElementById('api-saved-row').style.display = 'none';
+  document.querySelector('#api-setup-area .api-row').style.display = 'flex';
+  document.querySelector('#api-setup-area .api-save').style.display = 'block';
+  document.getElementById('ai-panel').classList.add('no-key');
+}
+
+function handleAIKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendAIMessage();
+  }
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+async function sendAIMessage() {
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if (!text || !apiKey) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('ai-send').disabled = true;
+
+  // Add user message
+  addAIMessage('user', text);
+
+  // Context: active cell code
+  let context = '';
+  if (activeCell) {
+    context = `\n\nCurrent cell code:\n\`\`\`python\n${activeCell.value}\n\`\`\``;
+  }
+
+  aiHistory.push({ role: 'user', content: text + context });
+
+  // Add thinking indicator
+  const thinkingId = 'thinking-' + Date.now();
+  const messagesDiv = document.getElementById('ai-messages');
+  const thinkingEl = document.createElement('div');
+  thinkingEl.id = thinkingId;
+  thinkingEl.className = 'ai-thinking';
+  thinkingEl.innerHTML = '<span></span><span></span><span></span>';
+  messagesDiv.appendChild(thinkingEl);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  try {
+    let reply = '';
+    if (apiProvider === 'openai') {
+      reply = await callOpenAI(aiHistory);
+    } else {
+      reply = await callAnthropic(aiHistory);
+    }
+    document.getElementById(thinkingId)?.remove();
+    aiHistory.push({ role: 'assistant', content: reply });
+    addAIMessage('ai', reply);
+  } catch(e) {
+    document.getElementById(thinkingId)?.remove();
+    addAIMessage('ai', `❌ Error: ${e.message}. Check your API key or provider.`);
+  }
+
+  document.getElementById('ai-send').disabled = false;
+}
+
+async function callOpenAI(history) {
+  const SYSTEM = `You are a friendly Python tutor helping an Imperial College London finance MSc student learn pandas and data analysis. The student has minimal coding experience.
+When suggesting code, always wrap it in \`\`\`python ... \`\`\` blocks.
+Keep explanations concise, friendly, and use simple analogies.
+Focus on pandas, numpy, and the AAPL stock data exercises they're working on.`;
+
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'system', content: SYSTEM }, ...history],
+      max_tokens: 800
+    })
+  });
+  if (!resp.ok) throw new Error(`OpenAI: ${resp.status} ${await resp.text()}`);
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+async function callAnthropic(history) {
+  const SYSTEM = `You are a friendly Python tutor helping an Imperial College London finance MSc student learn pandas and data analysis. The student has minimal coding experience.
+When suggesting code, always wrap it in \`\`\`python ... \`\`\` blocks.
+Keep explanations concise, friendly, and use simple analogies.
+Focus on pandas, numpy, and the AAPL stock data exercises they're working on.`;
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-ipc': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5',
+      max_tokens: 800,
+      system: SYSTEM,
+      messages: history
+    })
+  });
+  if (!resp.ok) throw new Error(`Anthropic: ${resp.status} ${await resp.text()}`);
+  const data = await resp.json();
+  return data.content[0].text;
+}
+
+function addAIMessage(role, content) {
+  const messagesDiv = document.getElementById('ai-messages');
+  const msgEl = document.createElement('div');
+  msgEl.className = 'msg ' + role;
+
+  if (role === 'user') {
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = content.split('\n\nCurrent cell code:')[0]; // Hide context from display
+    msgEl.appendChild(bubble);
+  } else {
+    // Parse markdown-ish: find ```python blocks
+    const parts = content.split(/(```(?:python)?\n[\s\S]*?```)/g);
+    parts.forEach(part => {
+      const codeMatch = part.match(/```(?:python)?\n([\s\S]*?)```/);
+      if (codeMatch) {
+        const code = codeMatch[1];
+        const block = document.createElement('div');
+        block.className = 'msg-code-block';
+        block.innerHTML = `
+          <div class="msg-code-toolbar">
+            <span class="msg-code-lang">python</span>
+            <button class="apply-btn" onclick="applyToCell(${JSON.stringify(code)})">⬆ Apply to cell</button>
+          </div>
+          <pre>${escHtml(code)}</pre>
+        `;
+        msgEl.appendChild(block);
+      } else if (part.trim()) {
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.innerHTML = part.replace(/`([^`]+)`/g, '<code style="font-family:monospace;font-size:12px;background:rgba(0,0,0,.3);padding:1px 4px;border-radius:3px">$1</code>');
+        msgEl.appendChild(bubble);
+      }
+    });
+  }
+
+  messagesDiv.appendChild(msgEl);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  // Remove welcome message if present
+  const welcome = messagesDiv.querySelector('.ai-welcome');
+  if (welcome) welcome.remove();
+}
+
+function applyToCell(code) {
+  if (!activeCell) {
+    alert('Click inside a code cell first, then click Apply.');
+    return;
+  }
+  activeCell.value = code;
+  activeCell.focus();
+  // Flash the cell
+  const cell = activeCell.closest('.cell');
+  cell.style.outline = '2px solid var(--accent)';
+  setTimeout(() => { cell.style.outline = ''; }, 700);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════════════════════════
+//  Boot
+// ══════════════════════════════════════════════════════
+initPyodide();
+</script>
