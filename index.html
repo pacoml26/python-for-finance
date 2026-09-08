@@ -2051,9 +2051,12 @@ function explainError(text) {
   switch (errType) {
     case 'NameError': {
       const v = errMsg.match(/name ['"](.+?)['"]/)?.[1];
-      return v
-        ? `"${v}" isn't defined yet — make sure you've run the cell that creates it first (use Run All ▶ if unsure).`
-        : 'A variable was used before it was created. Run the earlier cells first.';
+      if (!v) return 'A variable was used before it was created. Run the earlier cells first.';
+      // Capital first letter → almost certainly a column name missing quotes
+      if (v[0] === v[0].toUpperCase() && v[0] !== v[0].toLowerCase()) {
+        return `"${v}" looks like a column name but is missing quotes. Try '${v}' (with quotes) instead of ${v}.`;
+      }
+      return `"${v}" isn't defined yet — make sure you've run the cell that creates it first (use Run All ▶ if unsure).`;
     }
     case 'KeyError': {
       const k = errMsg.replace(/^['"]+|['"]+$/g, '');
