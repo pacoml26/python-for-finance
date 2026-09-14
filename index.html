@@ -574,7 +574,7 @@ details.solution[open] summary { border-bottom: 1px solid var(--border); }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-14 15:30 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-14 15:31 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -4547,11 +4547,11 @@ print(draft)</pre></div>
   </div>
 
   <div class="api-setup" id="api-setup-area">
-    <p>Connect your own AI. Your key is stored only in this tab — never sent to any server.</p>
+    <p>Connect a <strong>Claude</strong> key from <em>console.anthropic.com → API keys</em>. It stays in this tab and is sent only to Anthropic.</p>
     <div class="api-row">
       <select class="api-select" id="api-provider">
-        <option value="openai">ChatGPT</option>
         <option value="anthropic">Claude</option>
+        <option value="openai">ChatGPT (not supported in-browser)</option>
       </select>
       <input class="api-input" type="password" id="api-key-input" placeholder="sk-... or sk-ant-...">
     </div>
@@ -5501,8 +5501,26 @@ function toggleAI() {
 
 function saveApiKey() {
   const key = document.getElementById('api-key-input').value.trim();
-  const prov = document.getElementById('api-provider').value;
+  let prov = document.getElementById('api-provider').value;
   if (!key) return;
+
+  // The key itself says which provider it belongs to — trust it over the dropdown.
+  if (key.startsWith('sk-ant-') && prov !== 'anthropic') {
+    prov = 'anthropic';
+    document.getElementById('api-provider').value = 'anthropic';
+    addAIMessage('ai', "That's an Anthropic key, so I've switched the provider to Claude for you.");
+  }
+
+  // OpenAI send no CORS headers, so a browser can never reach them. Say so rather than
+  // letting it fail later as an opaque "failed to fetch".
+  if (prov === 'openai') {
+    addAIMessage('ai', "OpenAI's API cannot be called from a browser — they don't send the CORS headers that would allow it, so the request is blocked before it leaves the page. This is a limitation on their end, not something the page can work around. Use a Claude key (sk-ant-...) instead: console.anthropic.com → API keys.");
+    return;
+  }
+  if (!key.startsWith('sk-ant-')) {
+    addAIMessage('ai', "That doesn't look like an Anthropic key — they begin sk-ant-. Grab one from console.anthropic.com → API keys.");
+    return;
+  }
   apiKey = key;
   apiProvider = prov;
 
@@ -5704,7 +5722,7 @@ async function runWatchCheck(afterRun) {
 }
 
 // Build check — catches a stale cached copy before it wastes anyone's afternoon
-console.log('%c Finance Python — build 2026-09-14 15:30 UTC ', 'background:#5B4CF5;color:#fff;padding:2px 6px;border-radius:3px');
+console.log('%c Finance Python — build 2026-09-14 15:31 UTC ', 'background:#5B4CF5;color:#fff;padding:2px 6px;border-radius:3px');
 (function(){
   const src = callAnthropic.toString();
   if (src.includes('browser-ipc')) {
