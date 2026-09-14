@@ -613,6 +613,54 @@ details.solution[open] summary { border-bottom: 1px solid var(--border); }
       <span class="nav-dot"></span>Team Debrief
     </button>
   </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 3</div>
+    <button class="nav-item" onclick="nav('s3','s3-setup')"><span class="nav-dot"></span>Returns &amp; NumPy</button>
+    <button class="nav-item" onclick="nav('s3','s3-why')"><span class="nav-dot"></span>Why Log Returns</button>
+    <button class="nav-item" onclick="nav('s3','s3-bh')"><span class="nav-dot"></span>Buy &amp; Hold</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 4</div>
+    <button class="nav-item" onclick="nav('s4','s4-basics')"><span class="nav-dot"></span>Plotting Basics</button>
+    <button class="nav-item" onclick="nav('s4','s4-ma')"><span class="nav-dot"></span>Moving Averages</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 5</div>
+    <button class="nav-item" onclick="nav('s5','s5-intro')"><span class="nav-dot"></span>Panel Data</button>
+    <button class="nav-item" onclick="nav('s5','s5-groupby')"><span class="nav-dot"></span>Grouping &amp; Aggregating</button>
+    <button class="nav-item" onclick="nav('s5','s5-reshape')"><span class="nav-dot"></span>Reshaping</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 6</div>
+    <button class="nav-item" onclick="nav('s6','s6-corr')"><span class="nav-dot"></span>Correlation</button>
+    <button class="nav-item" onclick="nav('s6','s6-heat')"><span class="nav-dot"></span>Heatmaps</button>
+    <button class="nav-item" onclick="nav('s6','s6-sub')"><span class="nav-dot"></span>Subplots</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 7</div>
+    <button class="nav-item" onclick="nav('s7','s7-fit')"><span class="nav-dot"></span>Fitting OLS</button>
+    <button class="nav-item" onclick="nav('s7','s7-read')"><span class="nav-dot"></span>Reading the Output</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 8</div>
+    <button class="nav-item" onclick="nav('s8','s8-mac')"><span class="nav-dot"></span>MA Crossover</button>
+    <button class="nav-item" onclick="nav('s8','s8-func')"><span class="nav-dot"></span>Writing Functions</button>
+    <button class="nav-item" onclick="nav('s8','s8-bb')"><span class="nav-dot"></span>Bollinger Bands</button>
+    <button class="nav-item" onclick="nav('s8','s8-opt')"><span class="nav-dot"></span>Optimising Parameters</button>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 9</div>
+    <button class="nav-item" onclick="nav('s9','s9-form')"><span class="nav-dot"></span>Building a Portfolio</button>
+    <button class="nav-item" onclick="nav('s9','s9-sharpe')"><span class="nav-dot"></span>Sharpe Ratio</button>
+    <button class="nav-item" onclick="nav('s9','s9-opt')"><span class="nav-dot"></span>Optimising Weights</button>
+  </div>
 </nav>
 
 <!-- MAIN CONTENT -->
@@ -1307,7 +1355,8 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
     <div class="concept-box">
       <p><strong>Why sort?</strong> If dates are out of order, any rolling calculation (like a moving average) will be wrong. We first convert the Date column with <code>pd.to_datetime()</code> — this turns a text string like <code>"02/01/2026"</code> into a real date Python can sort and compare. The option <code>dayfirst=True</code> tells pandas the format is DD/MM/YYYY, not MM/DD/YYYY.</p>
       <p><strong>Why copy?</strong> <code>df = df_raw.copy()</code> creates a completely independent copy of the data. Without it, changes to <code>df</code> would silently modify <code>df_raw</code> too — always copy before cleaning.</p>
-      <p><strong>What is <code>inplace=True</code>?</strong> Most pandas methods return a <em>new</em> DataFrame and leave the original unchanged. Adding <code>inplace=True</code> modifies the DataFrame directly, so you don't need to write <code>df = df.sort_index()</code> — it just happens. Both styles are equivalent; <code>inplace=True</code> saves a line.</p>
+      <p><strong>Why we re-assign instead of using <code>inplace=True</code>.</strong> Most pandas methods return a <em>new</em> DataFrame and leave the original untouched, so you write <code>df = df.sort_index()</code>. Many methods also accept <code>inplace=True</code>, which modifies the DataFrame directly and returns nothing. It looks like it saves a line — but <strong>this course re-assigns every time</strong>, and so should you.</p>
+      <p>Three reasons. Re-assigning <strong>chains</strong>: <code>df.drop_duplicates().sort_index()</code> reads as one pipeline, while <code>inplace</code> versions cannot be chained at all because each returns <code>None</code>. It also fails loudly — the classic <code>inplace</code> bug is writing <code>df = df.sort_index(inplace=True)</code>, which silently sets <code>df</code> to <code>None</code> and breaks every cell after it. And <code>inplace</code> is on its way out: pandas is deprecating it, so code written with it now will start raising warnings.</p>
       <p><strong>Why remove duplicates?</strong> If the same date appears twice, averages and sums will be inflated. <code>drop_duplicates()</code> keeps the first occurrence of any repeated row and removes the rest.</p>
     </div>
 
@@ -1316,7 +1365,7 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
         <span class="exercise-badge original">Original</span>
         <h3>Sort by date and drop duplicates</h3>
       </div>
-      <p class="exercise-desc">The Date column uses <strong>day-first format</strong> (DD/MM/YYYY), so you must tell pandas <code>dayfirst=True</code> when converting. Then set it as the index using <code>set_index("Date", inplace=True)</code>, sort with <code>sort_index(inplace=True)</code>, and drop duplicates. Store the cleaned result in <code>df</code>.</p>
+      <p class="exercise-desc">The Date column uses <strong>day-first format</strong> (DD/MM/YYYY), so you must tell pandas <code>dayfirst=True</code> when converting. Then set it as the index with <code>set_index("Date")</code>, sort with <code>sort_index()</code>, drop the junk columns and the duplicates — re-assigning to <code>df</code> at each step, as above.</p>
       <div class="cell" id="cell-s2-3a">
         <div class="cell-toolbar">
           <span class="cell-num">In [ ]</span>
@@ -1327,19 +1376,19 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
           data-default="df = df_raw.copy()
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
-df.set_index('Date', inplace=True)
-df.sort_index(inplace=True)
-df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
-df.drop_duplicates(inplace=True)
+df = df.set_index('Date')
+df = df.sort_index()
+df = df.drop(columns=['Dividends', 'Stock Splits'])
+df = df.drop_duplicates()
 
 print(f'Raw rows:    {len(df_raw)}')
 print(f'Clean rows:  {len(df)}')
 df">df = df_raw.copy()
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
-df.set_index('Date', inplace=True)
-df.sort_index(inplace=True)
-df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
-df.drop_duplicates(inplace=True)
+df = df.set_index('Date')
+df = df.sort_index()
+df = df.drop(columns=['Dividends', 'Stock Splits'])
+df = df.drop_duplicates()
 
 print(f'Raw rows:    {len(df_raw)}')
 print(f'Clean rows:  {len(df)}')
@@ -1350,10 +1399,10 @@ df</textarea>
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>df = df_raw.copy()                                       # make an independent copy — changes to df won't touch df_raw
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)   # convert text dates to datetime; dayfirst=True because format is DD/MM/YYYY
-df.set_index('Date', inplace=True)                       # make Date the row index; inplace=True modifies df directly (no reassignment needed)
-df.sort_index(inplace=True)                              # sort rows oldest → newest by their date index
-df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)  # remove columns we don't need for price analysis
-df.drop_duplicates(inplace=True)                         # delete any row that is an exact copy of an earlier row
+df = df.set_index('Date')                                # make Date the row index; re-assign rather than inplace=True
+df = df.sort_index()                                     # sort rows oldest → newest by their date index
+df = df.drop(columns=['Dividends', 'Stock Splits'])      # columns= is required, or pandas looks for ROWS with those labels
+df = df.drop_duplicates()                                # delete any row that is an exact copy of an earlier row
 print(f'Removed {len(df_raw) - len(df)} duplicate rows')  # f-string: shows how many rows were cut
 df                                                       # display the cleaned table</pre></div>
       </details>
@@ -2155,6 +2204,1872 @@ summary.sort_values('Return %', ascending=False)  # best performer first</pre></
 
 </div><!-- /sec-s2b -->
 
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 3                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+<div class="page-section" id="sec-s3">
+
+  <div class="session-hero">
+    <div class="hero-num">3</div>
+    <div>
+      <h1>Returns & NumPy</h1>
+      <p>A price on its own tells you nothing — what matters is how it changed. This session covers simple returns, log returns, why quants prefer the latter, and how to compound either one into a cumulative performance figure.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s3', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s3-setup">
+    <h2>🔢 Getting Set Up</h2>
+    <div class="concept-box">
+      <p>We work with the <strong>cleaned</strong> Apple 2026 data from Session 2a. If you have not run that session in this browser tab, run the cell below — it reloads and re-cleans the file from scratch so this session stands alone.</p>
+      <p><code>numpy</code> (imported as <code>np</code> by convention) is the numerical library pandas is built on. You will use it here for one thing: <code>np.log()</code>, which takes the natural logarithm of every value in a column at once.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Setup</span>
+        <h3>Load and clean, then compute daily returns</h3>
+      </div>
+      <p class="exercise-desc">Rebuild the clean <code>df</code>, then add a <code>DailyReturn</code> column using <code>pct_change()</code>. That method compares each row to the one before it and returns the fractional change, so 0.02 means the price rose 2% that day.</p>
+      <div class="cell" id="cell-s3-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+import numpy as np
+
+# YOUR CODE HERE">import pandas as pd
+import numpy as np
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+import numpy as np                                 # np.log() needs this; np is the universal alias
+
+df = pd.read_csv('data/AAPL_2026_raw.csv')
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+df = df.set_index('Date').sort_index()
+df = df.drop(columns=['Dividends', 'Stock Splits']).drop_duplicates()
+df = df[~df.index.duplicated(keep='first')]        # same-date repeats drop_duplicates() cannot see
+df['Close'] = df['Close'].ffill().bfill()          # the only column this session actually needs
+
+df['DailyReturn'] = df['Close'].pct_change()
+# pct_change() = (today / yesterday) - 1, applied row by row
+# the first row has no "yesterday", so it is NaN — that is correct, not a bug
+
+df[['Close', 'DailyReturn']].head()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Log returns</h3>
+      </div>
+      <p class="exercise-desc">Add a <code>LogReturn</code> column: <code>np.log(df["Close"] / df["Close"].shift(1))</code>. <code>.shift(1)</code> moves the column down one row, so each row lines up against the previous day. Then compare the two return columns — for small moves they are almost identical.</p>
+      <div class="cell" id="cell-s3-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['LogReturn'] = np.log(df['Close'] / df['Close'].shift(1))
+# shift(1) pushes every value down one row, so the division is today / yesterday
+# np.log() then takes the natural log of that ratio, element by element
+
+print(df[['DailyReturn', 'LogReturn']].head(8))
+
+diff = (df['DailyReturn'] - df['LogReturn']).abs().max()
+print(f'\nLargest gap between the two: {diff:.5f}')
+# tiny for normal daily moves — log and simple returns only diverge on big days</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s3-why">
+    <h2>📐 Why Log Returns?</h2>
+    <div class="concept-box">
+      <p><strong>Log returns add up; simple returns do not.</strong> Gain 10% then lose 10% and you are not flat — you are down 1%, because the second move applies to a larger base. Simple returns have to be <em>compounded</em>: <code>(1 + r).prod() - 1</code>. Log returns can simply be <em>summed</em>: <code>.sum()</code>. That one property is why almost every quant model works in log space.</p>
+      <p>Two ways to accumulate, matching the two return types. For log returns use <code>.cumsum()</code> — a running total. For simple returns use <code>(1 + r).cumprod() - 1</code> — a running product, since each day multiplies the previous wealth.</p>
+      <p>To convert a log return back to a simple one, undo the logarithm: <code>np.exp(log_return) - 1</code>. <code>np.exp()</code> is the inverse of <code>np.log()</code>.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Cumulative log returns</h3>
+      </div>
+      <p class="exercise-desc">Add a <code>CumulativeReturn</code> column holding the running sum of your log returns. Because log returns are additive, <code>.cumsum()</code> is all you need.</p>
+      <div class="cell" id="cell-s3-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['CumulativeReturn'] = df['LogReturn'].cumsum()
+# cumsum() = running total: row 5 holds the sum of rows 1-5
+# valid only because log returns are additive — never do this with simple returns
+
+print(df[['Close', 'LogReturn', 'CumulativeReturn']].tail())</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Prove the two agree</h3>
+      </div>
+      <p class="exercise-desc">Compute the whole-period return two ways: sum the log returns and convert with <code>np.exp(x) - 1</code>, then compound the simple returns with <code>(1 + r).prod() - 1</code>. They should match to many decimal places. If they do not, something is wrong with your data.</p>
+      <div class="cell" id="cell-s3-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>log_period_return = df['LogReturn'].sum()            # add every daily log return together
+converted_log_return = np.exp(log_period_return) - 1  # np.exp undoes np.log, -1 turns a growth factor into a return
+
+period_simple_return = (1 + df['Close'].pct_change()).prod() - 1
+# .prod() multiplies every (1 + r) together — this is what compounding actually means
+# NaN in the first row is skipped automatically by .prod()
+
+print(f'Converted log period return {converted_log_return:%}')
+print(f'Simple period return        {period_simple_return:%}')
+print(f'Difference: {abs(converted_log_return - period_simple_return):.12f}')
+# :% formats 0.1234 as 12.340000% — note it does NOT need a *100</pre></div>
+      </details>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">⚠️</span>
+      <div>A return of <code>0.02</code> is 2%, not 0.02%. The <code>:%</code> and <code>:.2%</code> format codes multiply by 100 for you — writing <code>{r*100:.2f}%</code> <em>and</em> <code>:.2%</code> together is a classic double-counting bug.</div>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s3-bh">
+    <h2>📈 Buy &amp; Hold</h2>
+    <div class="concept-box">
+      <p>With a <code>CumulativeReturn</code> column in place, any buy-and-hold question becomes a lookup. Because the column is a running total from the first day, the value on any date <em>is</em> your return from the start of the data to that date.</p>
+      <p>Buying part-way through is different: you need the return accumulated <em>between</em> two dates, not from the beginning. Slice the period first, then compound only those rows.</p>
+      <p><strong>The off-by-one that matters.</strong> These are <em>close</em> prices. If you buy at the close on 1 April, you did not earn 1 April's return — that move happened before you owned it. Your first return is 2 April's. Getting this wrong flatters every backtest you will ever write, so slice from the day <em>after</em> you buy.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Buy & Hold</span>
+        <h3>Bought in January — when should you have sold?</h3>
+      </div>
+      <p class="exercise-desc">Using <code>CumulativeReturn</code>, print what you would have made buying at the start of 2026 and selling at the end of March, the end of April, and the end of May. Use <code>.loc["2026-03-31"]</code> to pull a single date.</p>
+      <div class="cell" id="cell-s3-5">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-5')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-5')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-5"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>print(f'''
+    Selling on 31 Mar {df["CumulativeReturn"].loc["2026-03-31"]:.2%}
+    versus selling on 30 Apr {df["CumulativeReturn"].loc["2026-04-30"]:.2%}
+    versus selling on 29 May {df["CumulativeReturn"].loc["2026-05-29"]:.2%}
+''')
+# triple quotes let one f-string span several lines, keeping the layout readable
+# .loc["2026-03-31"] pulls one date out of the cumulative column
+# :.2% formats as a percentage with 2 decimals — 0.0734 prints as 7.34%
+
+# Careful: these are LOG cumulative returns. For an exact simple return, convert:
+print(f'Exact simple return to 31 Mar: {np.exp(df["CumulativeReturn"].loc["2026-03-31"]) - 1:.2%}')</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Buy & Hold</span>
+        <h3>Bought on 1 April instead</h3>
+      </div>
+      <p class="exercise-desc">What if you bought at the close on 1 April and held to the end of the data? Slice from <strong>2 April</strong> — the first return you actually earn — and compound the daily returns across that window.</p>
+      <div class="cell" id="cell-s3-6">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-6')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-6')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-6"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># We buy at the close on 1 Apr, so the first return we earn is the change seen on 2 Apr
+period = df.loc['2026-04-02':]                      # open-ended slice: 2 Apr through to the last row
+print(f'Buy on 1 Apr, sell at end of period: {(1 + period["DailyReturn"]).prod() - 1:.2%}')
+# (1 + r).prod() - 1 compounds only the rows inside the slice
+
+# The same answer from the log column, as a cross-check
+span = df['CumulativeReturn'].iloc[-1] - df['CumulativeReturn'].loc['2026-04-01']
+print(f'Same figure via log returns:         {np.exp(span) - 1:.2%}')
+# subtracting two points on a cumulative-sum curve gives the return BETWEEN them</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Best and worst single days</h3>
+      </div>
+      <p class="exercise-desc">Find the largest one-day gain and the largest one-day loss in the period, with their dates. Then count how many days were positive.</p>
+      <div class="cell" id="cell-s3-7">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s3-7')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s3-7')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s3-7"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>best, worst = df['DailyReturn'].idxmax(), df['DailyReturn'].idxmin()
+# idxmax/idxmin return the INDEX LABEL (the date), not the value
+
+print(f'Best day:  {df["DailyReturn"].max():+.2%} on {best.date()}')
+print(f'Worst day: {df["DailyReturn"].min():+.2%} on {worst.date()}')
+# :+ forces the sign to show, so a loss reads -3.10% and a gain +3.10%
+
+up = (df['DailyReturn'] &gt; 0).sum()                  # a mask summed = a count of True
+total = df['DailyReturn'].notna().sum()             # notna() excludes that first NaN row
+print(f'\nUp days: {up} of {total}  ({up/total:.1%})')</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 4                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+</div><!-- /sec-s3 -->
+
+<div class="page-section" id="sec-s4">
+
+  <div class="session-hero">
+    <div class="hero-num">4</div>
+    <div>
+      <h1>Visualisation</h1>
+      <p>A table of 250 numbers hides what a single chart makes obvious. This session covers matplotlib — plotting price series, layering moving averages on top, and labelling a chart so it can stand on its own in a deck.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s4', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s4-basics">
+    <h2>📊 Plotting Basics</h2>
+    <div class="concept-box">
+      <p><code>matplotlib.pyplot</code>, imported as <code>plt</code>, is the standard plotting library. The pattern is always the same: open a figure, draw onto it, label it, show it.</p>
+      <p><code>plt.figure(figsize=(10, 5))</code> starts a new chart 10 inches wide by 5 tall — width matters most for time series, since you are fitting a year onto one axis. <code>plt.plot(series)</code> draws a line; when the series has a datetime index, matplotlib formats the x-axis as dates on its own. <code>plt.title()</code>, <code>plt.xlabel()</code> and <code>plt.ylabel()</code> label it, <code>label="..."</code> inside <code>plt.plot()</code> names a line for the <code>plt.legend()</code> box, and <code>alpha=0.5</code> makes a line semi-transparent so lines drawn after it stay readable.</p>
+      <p><code>plt.tight_layout()</code> at the end stops axis labels being clipped at the edges of the figure.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Setup</span>
+        <h3>Load NVDA and plot the closing price</h3>
+      </div>
+      <p class="exercise-desc">Load <code>data/NVDA_2025.csv</code>, set a datetime index, and plot the closing price with a title and axis labels.</p>
+      <div class="cell" id="cell-s4-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s4-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s4-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+import matplotlib.pyplot as plt
+
+# YOUR CODE HERE">import pandas as pd
+import matplotlib.pyplot as plt
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s4-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+import matplotlib.pyplot as plt                     # plt is the universal alias for pyplot
+
+df = pd.read_csv('data/NVDA_2025.csv')
+df['Date'] = pd.to_datetime(df['Date'])
+df = df.set_index('Date').sort_index()              # datetime index → matplotlib formats the x-axis as dates
+
+plt.figure(figsize=(10, 4))                         # (width, height) in inches; wide suits time series
+plt.title('NVDA Closing Price')
+plt.xlabel('Date')
+plt.ylabel('USD')
+plt.plot(df['Close'])
+plt.tight_layout()                                  # stops the axis labels being cut off at the edges</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s4-ma">
+    <h2>🎚 Moving Averages</h2>
+    <div class="concept-box">
+      <p>A moving average smooths a noisy price into a trend. <code>df["Close"].rolling(20).mean()</code> slides a 20-row window down the column and averages whatever sits inside it, so each point is the mean of that day and the 19 before it.</p>
+      <p>The window length is the whole trade-off. A <strong>fast</strong> average (20 days) hugs the price and turns quickly, but whipsaws on noise. A <strong>slow</strong> one (120 days) ignores noise and shows the underlying trend, but turns long after the move began. Neither is right — they answer different questions, and Session 8 builds a trading strategy out of exactly that tension.</p>
+      <p>The first rows come back as <code>NaN</code>, and that is correct: a 120-day average genuinely does not exist until day 120. Matplotlib simply leaves that stretch of the line blank.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Speedometer</span>
+        <h3>Fast vs slow moving average</h3>
+      </div>
+      <p class="exercise-desc">Add a 20-day <code>FastMA</code> and a 120-day <code>SlowMA</code>, then plot all three lines — close, fast, slow — on one chart with a title, axis labels, and a legend.</p>
+      <div class="cell" id="cell-s4-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s4-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s4-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s4-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['FastMA'] = df['Close'].rolling(20).mean()       # mean of each day and the 19 before it
+df['SlowMA'] = df['Close'].rolling(120).mean()      # same idea over a much longer window
+
+plt.figure(figsize=(10, 5))
+
+plt.title('NVDA with Moving Averages')
+plt.xlabel('Date')
+plt.ylabel('USD')
+
+plt.plot(df['Close'], alpha=0.5, label='Close')     # alpha=0.5 fades the price so the MAs read on top
+plt.plot(df['FastMA'], label='20-day MA')           # label= is what the legend box displays
+plt.plot(df['SlowMA'], label='120-day MA')
+
+plt.legend()                                        # without this call the labels are never drawn
+plt.tight_layout()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Where do the averages cross?</h3>
+      </div>
+      <p class="exercise-desc">A crossover — fast rising through slow — is the classic buy signal. Find the dates where it happens by comparing the two columns and looking for where that comparison flips.</p>
+      <div class="cell" id="cell-s4-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s4-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s4-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s4-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>above = df['FastMA'] &gt; df['SlowMA']                 # True on days the fast average leads
+cross = above != above.shift()                      # True only where today differs from yesterday
+cross = cross &amp; df['SlowMA'].notna()                # ignore the warm-up period where SlowMA is NaN
+
+print('Crossover dates:')
+for d in df.index[cross]:
+    direction = 'golden cross (bullish)' if above[d] else 'death cross (bearish)'
+    print(f'  {d.date()}  {direction}')
+
+plt.figure(figsize=(10, 4))
+plt.title('NVDA — crossovers marked')
+plt.plot(df['Close'], alpha=0.35, label='Close')
+plt.plot(df['FastMA'], label='20-day')
+plt.plot(df['SlowMA'], label='120-day')
+plt.scatter(df.index[cross], df.loc[cross, 'Close'], color='red', zorder=5, label='Crossover')
+# scatter draws individual points; zorder=5 keeps them on top of the lines
+plt.legend(); plt.tight_layout()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Daily returns as a histogram</h3>
+      </div>
+      <p class="exercise-desc">Not every chart is a line. Plot the distribution of daily returns with <code>plt.hist()</code> to see how fat the tails really are.</p>
+      <div class="cell" id="cell-s4-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s4-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s4-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s4-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>returns = df['Close'].pct_change().dropna()         # dropna() removes the first NaN row
+
+plt.figure(figsize=(9, 4))
+plt.title('NVDA Daily Returns — distribution')
+plt.xlabel('Daily return')
+plt.ylabel('Number of days')
+plt.hist(returns, bins=50, edgecolor='white')       # bins=50 → 50 buckets across the range
+plt.axvline(0, color='black', linewidth=1)          # axvline draws a vertical line at x=0 for reference
+plt.tight_layout()
+
+print(f'Mean daily return: {returns.mean():+.3%}')
+print(f'Std dev (daily):   {returns.std():.3%}')
+print(f'Annualised vol:    {returns.std() * (252 ** 0.5):.1%}')
+# multiply a daily standard deviation by sqrt(252) to annualise it — 252 trading days in a year</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 5                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+</div><!-- /sec-s4 -->
+
+<div class="page-section" id="sec-s5">
+
+  <div class="session-hero">
+    <div class="hero-num">5</div>
+    <div>
+      <h1>Panel Data &amp; Reshaping</h1>
+      <p>Until now every dataset held one stock. Real research data holds hundreds at once, stacked into one long table. This session covers how that shape works, how groupby summarises it, and how to pivot between long and wide.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s5', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s5-intro">
+    <h2>🗃 What Panel Data Looks Like</h2>
+    <div class="concept-box">
+      <p><strong>Panel data</strong> tracks many entities over many dates. Stored <em>long</em>, each row is one stock on one day, so a ticker column tells you which stock each row belongs to. 20 stocks × 250 days is 5,000 rows, not a 250×20 grid.</p>
+      <p>This file comes from <strong>Compustat</strong> via WRDS, which your Imperial login gives you access to. Its column names are terse and worth learning, because you will meet them again: <code>datadate</code> the date, <code>tic</code> the ticker, <code>conm</code> the company name, <code>exchg</code> the exchange code (11 = NYSE, 14 = NASDAQ), <code>prcod</code> / <code>prchd</code> / <code>prcld</code> / <code>prccd</code> the open, high, low and close, and <code>cshtrd</code> the shares traded.</p>
+      <p>Long format is what <code>groupby</code> is built for. Wide format — dates down, tickers across — is what correlation and portfolio maths need. You will move between the two constantly.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Setup</span>
+        <h3>Load the panel and look at its shape</h3>
+      </div>
+      <p class="exercise-desc">Load <code>data/SP500_2025.csv</code>, parse <code>datadate</code>, and get a feel for the size: how many rows, how many distinct tickers, and what date range it covers.</p>
+      <div class="cell" id="cell-s5-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+
+# YOUR CODE HERE">import pandas as pd
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+
+df = pd.read_csv('data/SP500_2025.csv')
+df['datadate'] = pd.to_datetime(df['datadate'])     # still just text until you convert it
+
+print('Rows:', len(df))
+print('Tickers:', df['tic'].nunique())              # nunique() counts DISTINCT values
+print('Dates:', df['datadate'].min().date(), '→', df['datadate'].max().date())
+print('Rows per ticker:', len(df) // df['tic'].nunique())
+df.head()</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s5-groupby">
+    <h2>🧮 Grouping and Aggregating</h2>
+    <div class="concept-box">
+      <p><code>groupby</code> is the workhorse of panel analysis. <code>df.groupby("tic")["cshtrd"].sum()</code> reads left to right as: split the rows into one group per ticker, take the <code>cshtrd</code> column, and total it within each group. You get one row back per group.</p>
+      <p>The aggregation on the end decides what you get: <code>.sum()</code> totals, <code>.mean()</code> averages, <code>.nunique()</code> counts distinct values, <code>.size()</code> counts rows, and <code>.first()</code> / <code>.last()</code> take the earliest or latest row in each group.</p>
+      <p>Group by a <strong>list</strong> of columns to split on several keys at once. Chain <code>.nlargest(n)</code> to keep only the top n results, which saves sorting and slicing by hand.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Tick Tick</span>
+        <h3>Unique tickers per exchange</h3>
+      </div>
+      <p class="exercise-desc">How many distinct tickers trade on each exchange? Group by <code>exchg</code> and count distinct values of <code>tic</code>.</p>
+      <div class="cell" id="cell-s5-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df.groupby('exchg')['tic'].nunique()
+# one group per exchange code, then count the DISTINCT tickers inside each
+# .nunique() not .count() — count() would give you the number of ROWS, ~250 per stock</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Trading Exchanges</span>
+        <h3>Total volume per exchange</h3>
+      </div>
+      <p class="exercise-desc">Which exchange saw more shares change hands across the year? Same grouping, different column and aggregation.</p>
+      <div class="cell" id="cell-s5-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df.groupby('exchg')['cshtrd'].sum()
+# total shares traded per exchange across every stock and every day in the file</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Big Days</span>
+        <h3>Top three weekdays by volume</h3>
+      </div>
+      <p class="exercise-desc">Which three days of the week see the most total trading? Extract the weekday name with <code>.dt.day_name()</code>, then group and take the top three.</p>
+      <div class="cell" id="cell-s5-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['day'] = df['datadate'].dt.day_name()            # .dt unlocks date methods on a datetime COLUMN
+                                                    # (on an index it is df.index.day_name(), no .dt)
+df.groupby('day')['cshtrd'].sum().nlargest(3)
+# nlargest(3) keeps the three biggest values — shorter than sort_values(ascending=False).head(3)</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · The 1000 Club</span>
+        <h3>Closes above $1000, by company and month</h3>
+      </div>
+      <p class="exercise-desc">For securities that closed above $1000, how many times did each achieve this in each month? Filter first, then group by company, ticker and month, and count the rows in each group.</p>
+      <div class="cell" id="cell-s5-5">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-5')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-5')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-5"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df['month'] = df['datadate'].dt.month               # 1-12; group keys do not have to exist in the raw file
+
+df[df['prccd'] &gt; 1000].groupby(['conm', 'tic', 'month']).size().rename('closes above 1000').reset_index()
+# filter FIRST so only qualifying rows are grouped
+# a LIST of group keys splits on all three at once
+# .size() counts rows per group (unlike .sum(), it needs no column)
+# .rename() names the resulting column; .reset_index() flattens the group keys back into columns</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Quick Quarter Query</span>
+        <h3>First open and last close per ticker</h3>
+      </div>
+      <p class="exercise-desc">Build a summary table with one row per ticker holding the company name, the first open of the period and the last close. Then add a column for the difference. <code>.agg()</code> takes a dict mapping each column to the aggregation you want.</p>
+      <div class="cell" id="cell-s5-6">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-6')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-6')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-6"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>aggregated = (
+    df.groupby('tic')
+    .agg(
+        {
+            'conm': 'first',                        # company name is constant per ticker — 'first' just carries it through
+            'prcod': 'first',                       # earliest open in the period (rows are date-ordered)
+            'prccd': 'last'                         # latest close
+        }
+        )
+)
+aggregated['diff'] = aggregated['prccd'] - aggregated['prcod']
+# arithmetic between two columns works row by row
+aggregated.sort_values('diff', ascending=False)</pre></div>
+      </details>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡</span>
+      <div><code>.agg()</code> with a dict is how you apply <em>different</em> aggregations to different columns in one pass. Passing a single string, as in <code>.agg("mean")</code>, applies it to every column instead.</div>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s5-reshape">
+    <h2>🔄 Reshaping: Long ↔ Wide</h2>
+    <div class="concept-box">
+      <p><code>pivot()</code> turns long into wide. You tell it three things: <code>index</code> — what goes down the side, <code>columns</code> — what spreads across the top, and <code>values</code> — what fills the grid. <code>df.pivot(index="datadate", columns="tic", values="prccd")</code> gives dates down, tickers across, closing prices inside. That is the shape correlation matrices and portfolio weights need.</p>
+      <p><code>resample()</code> changes the <em>frequency</em> of a datetime index. <code>"D"</code> is calendar days, <code>"W"</code> weeks, <code>"ME"</code> month-end, <code>"QE"</code> quarter-end. It needs to know how to combine the rows it merges: <code>.mean()</code>, <code>.sum()</code>, <code>.last()</code>, or <code>.asfreq()</code> to take the value as-is without aggregating.</p>
+      <p>Resampling <em>up</em> to a finer frequency creates rows that never existed. Markets do not trade at weekends, so <code>resample("D")</code> invents Saturdays and Sundays and fills them with <code>NaN</code> — which is a question about your data, not a bug to paper over.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Trading Top Ten</span>
+        <h3>Pivot on volume, find the top ten</h3>
+      </div>
+      <p class="exercise-desc">Pivot the panel using <code>cshtrd</code> for values, then total each stock's volume and display the ten largest.</p>
+      <div class="cell" id="cell-s5-7">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-7')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-7')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-7"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>volume = df.pivot(index='datadate', columns='tic', values='cshtrd')
+# now: one row per date, one COLUMN per ticker, volume in the cells
+
+volume.sum().nlargest(10).rename('Total trading volume')
+# .sum() on a wide frame totals DOWN each column by default, giving one figure per ticker
+# nlargest(10) keeps the ten busiest</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Losing Days</span>
+        <h3>Resample to calendar days — then decide what to do</h3>
+      </div>
+      <p class="exercise-desc">Resample the volume pivot to calendar days with <code>.asfreq()</code>. Weekends appear as <code>NaN</code>. Does that need cleaning, and what would you propose?</p>
+      <div class="cell" id="cell-s5-8">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-8')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-8')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-8"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>daily = volume.resample('D').asfreq()
+# 'D' = every calendar day; asfreq() takes existing values as-is rather than aggregating
+# weekends and holidays had no trading, so those new rows are entirely NaN
+
+print('Business days:', len(volume), '→ calendar days:', len(daily))
+print('Fully empty rows:', daily.isnull().all(axis=1).sum())
+# axis=1 checks ACROSS each row — True only where every ticker is NaN, i.e. a non-trading day
+
+daily.fillna(0)
+# Filling with 0 is defensible HERE and only here: zero volume is literally true on a day
+# the market was shut. Never do this to a PRICE column — a price of 0 is a lie that would
+# show up as a -100% return. For prices, either ffill the last close or leave the NaN in place.</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Monthly average close per stock</h3>
+      </div>
+      <p class="exercise-desc">Pivot on closing price, then resample to month-end and take the mean. This is how you turn daily noise into something readable in a report.</p>
+      <div class="cell" id="cell-s5-9">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s5-9')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s5-9')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s5-9"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>prices = df.pivot(index='datadate', columns='tic', values='prccd')
+
+monthly = prices.resample('ME').mean().round(2)     # 'ME' = month end; mean of every trading day in the month
+print(monthly[['AAPL', 'MSFT', 'NVDA', 'TSLA']])    # a few columns, so the output stays readable
+
+monthly_ret = prices.resample('ME').last().pct_change()
+# .last() takes the final close of each month, THEN pct_change gives month-on-month returns
+# taking pct_change on the MEAN would be wrong — an average is not a tradeable price
+print('\nBest month per stock (%):')
+print((monthly_ret.max() * 100).round(1).sort_values(ascending=False).head())</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 6                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+</div><!-- /sec-s5 -->
+
+<div class="page-section" id="sec-s6">
+
+  <div class="session-hero">
+    <div class="hero-num">6</div>
+    <div>
+      <h1>Panel Visualisation</h1>
+      <p>With many stocks in one frame the interesting question stops being "how did it move" and becomes "what moved together". This session covers correlation matrices, heatmaps and regression plots with seaborn, and laying several charts side by side.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s6', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s6-corr">
+    <h2>🔗 Correlation Across Stocks</h2>
+    <div class="concept-box">
+      <p><strong>seaborn</strong> (imported as <code>sns</code>) sits on top of matplotlib and gives you statistical charts in one line. It loads the first time you run a cell that mentions it, so expect a short pause on that cell only.</p>
+      <p>Correlate <strong>returns, never prices</strong>. Two stocks that both drifted upward all year will show a price correlation near 1 even if their day-to-day behaviour is unrelated — the shared trend swamps everything. Returns strip that out and leave the co-movement you actually care about.</p>
+      <p>So the pipeline is always: pivot to wide, <code>.pct_change()</code> to returns, <code>.dropna()</code> to drop the first empty row, then <code>.corr()</code> for the matrix. Values run from +1 (move together) through 0 (unrelated) to −1 (move oppositely).</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Setup</span>
+        <h3>Build the returns matrix and correlate it</h3>
+      </div>
+      <p class="exercise-desc">Load the panel, pivot to wide on <code>prccd</code>, convert to daily returns, and compute the correlation matrix. Print the matrix for a handful of tech names.</p>
+      <div class="cell" id="cell-s6-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s6-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s6-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# YOUR CODE HERE">import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s6-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns                               # loads on first use — one-off pause
+
+df = pd.read_csv('data/SP500_2025.csv')
+df['datadate'] = pd.to_datetime(df['datadate'])
+
+prices = df.pivot(index='datadate', columns='tic', values='prccd')
+returns_matrix = prices.pct_change().dropna()
+# correlate RETURNS, not prices — shared upward drift would fake a high price correlation
+
+corr = returns_matrix.corr()                        # every column against every other column
+print(corr.loc[['AAPL','MSFT','GOOGL','NVDA','META'],
+               ['AAPL','MSFT','GOOGL','NVDA','META']].round(2))</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s6-heat">
+    <h2>🌡 Heatmaps</h2>
+    <div class="concept-box">
+      <p>A 20×20 grid of numbers is unreadable; the same grid coloured is obvious at a glance. <code>sns.heatmap(corr)</code> does it in one line.</p>
+      <p>Three arguments earn their place. <code>annot=True</code> prints the number inside each square. <code>cmap="coolwarm"</code> picks a <em>diverging</em> palette, which is the right choice whenever zero is a meaningful midpoint — red one way, blue the other, pale in the middle. And <code>vmin=-1, vmax=1</code> pins the colour scale to the full correlation range, so pale always means "uncorrelated" instead of "middling for this particular dataset".</p>
+      <p>The diagonal is always 1 — every stock correlates perfectly with itself — and the matrix is symmetric, so only half of it carries information.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Heatmap of the correlation matrix</h3>
+      </div>
+      <p class="exercise-desc">Draw a heatmap of the correlations for eight or so stocks. Annotate the cells and pin the colour scale from −1 to 1.</p>
+      <div class="cell" id="cell-s6-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s6-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s6-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s6-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>subset = ['AAPL','MSFT','GOOGL','AMZN','NVDA','AVGO','META','XOM','JNJ']
+corr = returns_matrix[subset].corr()
+
+plt.figure(figsize=(8, 6.5))
+sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', vmin=-1, vmax=1, square=True)
+# annot=True writes the number in each cell; fmt='.2f' keeps it to 2 decimals
+# vmin/vmax fix the scale so colours mean the same thing in every chart you make
+plt.title('2025 daily return correlations')
+plt.tight_layout()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Find the strongest and weakest pairs</h3>
+      </div>
+      <p class="exercise-desc">Read the pairs out of the matrix instead of squinting at it. Mask the diagonal, stack the matrix into a list of pairs, and sort.</p>
+      <div class="cell" id="cell-s6-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s6-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s6-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s6-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import numpy as np
+
+c = returns_matrix.corr()
+pairs = c.where(~np.eye(len(c), dtype=bool)).stack()
+# np.eye() is an identity matrix — True down the diagonal
+# ~ inverts it, .where() blanks the diagonal so a stock cannot pair with itself
+# .stack() collapses the grid into one long Series indexed by (stock A, stock B)
+
+print('Most correlated pairs:')
+print(pairs.sort_values(ascending=False).head(6).round(3))
+print('\nLeast correlated pairs:')
+print(pairs.sort_values().head(6).round(3))
+# note each pair appears twice (A-B and B-A) since the matrix is symmetric</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s6-sub">
+    <h2>🖼 Regression Plots and Subplots</h2>
+    <div class="concept-box">
+      <p><code>sns.regplot(x=..., y=...)</code> draws a scatter of two series with a fitted line and a shaded confidence band through it. It is the fastest way to <em>see</em> whether a relationship is there before you formally model it in Session 7.</p>
+      <p>To place charts side by side, <code>fig, (ax1, ax2) = plt.subplots(ncols=2)</code> hands you a figure and one axis object per panel. From there the API changes: you pass <code>ax=ax1</code> to tell seaborn where to draw, and you label with <code>ax1.set_title()</code> and <code>ax1.set_xlabel()</code> rather than <code>plt.title()</code>. The <code>plt.</code> functions only ever act on whichever panel is "current", which is why anything with more than one panel uses the axis methods instead.</p>
+      <p><code>fig.subplots_adjust(wspace=0.3)</code> widens the gap between panels so the y-label of the right-hand chart does not collide with the left one.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Double Regression</span>
+        <h3>A strong and a weak relationship, side by side</h3>
+      </div>
+      <p class="exercise-desc">Use subplots to put two regression plots next to each other — one showing a strong relationship, one weak. Use the correlation matrix above to pick the pairs.</p>
+      <div class="cell" id="cell-s6-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s6-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s6-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s6-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># Create a figure and a set of subplots
+fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10, 5))
+# unpacking (ax1, ax2) gives one axis object per panel
+
+# Adjust the space between the two plots
+fig.subplots_adjust(wspace=0.3)                     # wspace = horizontal gap, as a fraction of panel width
+
+# Plot the regression plot on the first (left) subplot
+sns.regplot(x=returns_matrix.MSFT, y=returns_matrix.GOOGL, ax=ax1)
+# ax=ax1 sends this chart to the left panel; without it both would land on top of each other
+ax1.set_title('Strong Regression')
+ax1.set_xlabel('MSFT')                              # on an axis object it is set_xlabel, not plt.xlabel
+ax1.set_ylabel('GOOGL')
+
+# And on the second
+sns.regplot(x=returns_matrix.META, y=returns_matrix.NVDA, ax=ax2)
+ax2.set_title('Weak Regression')
+ax2.set_xlabel('META')
+ax2.set_ylabel('NVDA')
+
+# Display the figure
+plt.show()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Cumulative performance of every stock</h3>
+      </div>
+      <p class="exercise-desc">One chart, every stock, rebased so they start together. This is the standard "who won the year" picture.</p>
+      <div class="cell" id="cell-s6-5">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s6-5')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s6-5')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s6-5"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>cum = (1 + returns_matrix).cumprod() - 1            # compound each column into a cumulative return
+
+plt.figure(figsize=(11, 5))
+for tic in cum.columns:
+    plt.plot(cum.index, cum[tic] * 100, label=tic, linewidth=1.2)
+    # looping gives one line per stock; ×100 puts the y-axis in percent
+
+plt.title('2025 cumulative return by stock')
+plt.ylabel('Return (%)')
+plt.axhline(0, color='black', linewidth=0.8)        # a flat reference line at break-even
+plt.legend(ncol=4, fontsize=8)                      # ncol spreads 20 entries over 4 columns
+plt.tight_layout()
+
+print('Final ranking:')
+print((cum.iloc[-1] * 100).round(1).sort_values(ascending=False).to_string())</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 7                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+</div><!-- /sec-s6 -->
+
+<div class="page-section" id="sec-s7">
+
+  <div class="session-hero">
+    <div class="hero-num">7</div>
+    <div>
+      <h1>Regression</h1>
+      <p>Correlation says two things move together. Regression puts a number on it — how much of one is explained by the other, and whether that relationship is strong enough to believe. This session covers fitting an OLS model with statsmodels and reading the output properly.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s7', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s7-fit">
+    <h2>📉 Fitting an OLS Model</h2>
+    <div class="concept-box">
+      <p><strong>statsmodels</strong> is the library for statistical modelling, and it loads on first use like seaborn. <strong>OLS</strong> — ordinary least squares — fits the straight line minimising the squared vertical distance to every point.</p>
+      <p>The line is <code>y = α + βx</code>. Your <strong>response</strong> <code>y</code> is what you are explaining; your <strong>predictor</strong> <code>x</code> is what you are explaining it with. In <code>sm.OLS(y, X)</code> the response comes <em>first</em> — swap them and you fit a different model that answers a different question.</p>
+      <p><strong>You must call <code>sm.add_constant(X)</code>.</strong> Without it statsmodels fits <code>y = βx</code> with no intercept, forcing the line through the origin and biasing β. It is the single most common mistake with this library, and nothing warns you.</p>
+      <p>Fit with <code>.fit()</code>, then read <code>.summary()</code>.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Setup</span>
+        <h3>Load two stocks and compute their returns</h3>
+      </div>
+      <p class="exercise-desc">Load <code>data/trading_data.csv</code> — Apple and Google closes side by side. Add a returns column for each. See if you can do Apple in one line.</p>
+      <div class="cell" id="cell-s7-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s7-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s7-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+
+# YOUR CODE HERE">import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s7-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm                        # loads on first use — one-off pause
+
+trading_data = pd.read_csv('data/trading_data.csv')
+trading_data['Date'] = pd.to_datetime(trading_data['Date'])
+trading_data = trading_data.set_index('Date').sort_index()
+
+trading_data['AAPL_Returns'] = (trading_data['AAPL.Close'] / trading_data['AAPL.Close'].shift(1)) - 1
+# today / yesterday - 1, done manually — pct_change() is the shorthand for exactly this
+trading_data['GOOG_Returns'] = trading_data['GOOG.Close'].pct_change()
+
+trading_data.head()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Regress Google returns on Apple returns</h3>
+      </div>
+      <p class="exercise-desc">Fit an OLS model with Google as the response and Apple as the predictor. Drop the NaN rows first, remember <code>add_constant</code>, and print the summary.</p>
+      <div class="cell" id="cell-s7-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s7-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s7-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s7-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>data = trading_data.dropna()                        # OLS refuses to run with NaN present
+
+y = data['GOOG_Returns']                            # response — what we are trying to explain
+X = data['AAPL_Returns']                            # predictor — what we are explaining it with
+X = sm.add_constant(X)                              # adds a column of 1s so the model fits an INTERCEPT
+                                                    # skip this and the line is forced through (0,0)
+
+model = sm.OLS(y, X).fit()                          # response FIRST, then predictors; .fit() runs it
+print(model.summary())</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s7-read">
+    <h2>🔍 Reading the Output</h2>
+    <div class="concept-box">
+      <p><strong>coef</strong> on your predictor is the slope β: a one-unit move in x is associated with a β move in y. Between two stocks' returns this is a beta in the finance sense — how much Google moves for a given Apple move. The <code>const</code> coefficient is α, the intercept.</p>
+      <p><strong>R-squared</strong> is the share of variance in y explained by x, from 0 to 1. On daily stock returns anything above roughly 0.3 is a strong relationship — these are noisy series, and expecting the 0.9 you see in a textbook is a misunderstanding of the data, not a failure of the model.</p>
+      <p><strong>P&gt;|t|</strong> is the p-value: the probability of seeing a coefficient this large if the true relationship were zero. Below 0.05 is the conventional threshold for "statistically significant".</p>
+      <p>And the warning worth repeating: <strong>this is association, not causation.</strong> Apple returns do not <em>cause</em> Google returns. Both are technology stocks responding to the same market and sector news, which is precisely the shared factor structure you saw in the Session 6 heatmap.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Plotting</span>
+        <h3>Scatter the data with the regression line on top</h3>
+      </div>
+      <p class="exercise-desc">Plot Google returns against Apple returns with the response on the y-axis, then add the fitted line. Pull the fitted values from <code>model.fittedvalues</code>, store them back on the frame, and sort by Apple returns so the line draws cleanly.</p>
+      <div class="cell" id="cell-s7-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s7-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s7-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s7-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># Add the fitted values to the original data frame for plotting
+trading_data['fitted'] = model.fittedvalues
+# fittedvalues are the model's predicted y for each row, and they keep the same index,
+# so assigning them back aligns automatically (rows dropped by dropna stay NaN)
+
+# Sort the data by Apple Returns for a cleaner plot
+plot_data = trading_data.sort_values('AAPL_Returns')
+# plt.plot connects points in ROW order, so unsorted x values would zig-zag across the chart
+
+plt.figure(figsize=(8, 5))
+
+plt.scatter(plot_data['AAPL_Returns'], plot_data['GOOG_Returns'], label='Data')
+plt.plot(plot_data['AAPL_Returns'], plot_data['fitted'], color='red', label='Regression Line')
+plt.xlabel('Apple Returns')
+plt.ylabel('Google Returns')
+plt.title('Google vs Apple Returns')
+plt.legend()
+plt.show()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Pull the numbers out one by one</h3>
+      </div>
+      <p class="exercise-desc">The summary is for reading; for a report you want the individual figures. Access them from the fitted model directly.</p>
+      <div class="cell" id="cell-s7-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s7-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s7-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s7-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>alpha, beta = model.params['const'], model.params['AAPL_Returns']
+# .params is a Series of coefficients, indexed by predictor name
+
+print(f'Alpha (intercept): {alpha:+.5f}')
+print(f'Beta  (slope):     {beta:.3f}')
+print(f'R-squared:         {model.rsquared:.3f}')
+print(f'p-value on beta:   {model.pvalues["AAPL_Returns"]:.2e}')  # :.2e = scientific notation
+print(f'Observations:      {int(model.nobs)}')
+
+print(f'\nA 1% move in AAPL is associated with a {beta:.2f}% move in GOOG.')
+print(f'AAPL explains {model.rsquared:.0%} of the variation in GOOG returns.')
+verdict = 'significant' if model.pvalues['AAPL_Returns'] &lt; 0.05 else 'NOT significant'
+print(f'The relationship is statistically {verdict} at the 5% level.')</pre></div>
+      </details>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">⚠️</span>
+      <div>A high R² on <em>price</em> levels is almost always spurious — two rising series correlate whatever they are. Regress returns on returns, as here, and the number means something.</div>
+    </div>
+
+  </div>
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 8                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+</div><!-- /sec-s7 -->
+
+<div class="page-section" id="sec-s8">
+
+  <div class="session-hero">
+    <div class="hero-num">8</div>
+    <div>
+      <h1>Trading Strategies</h1>
+      <p>Everything so far has described the past. A strategy takes a position on the future: a rule that turns prices into signals, signals into positions, and positions into a return you can compare against simply holding the stock.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s8', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s8-mac">
+    <h2>⚔️ Moving Average Crossover</h2>
+    <div class="concept-box">
+      <p>The pipeline has four stages, and the order matters. A <strong>signal</strong> is what the rule says today: +1 long, −1 short, 0 flat. A <strong>position</strong> is what you actually hold, which is the signal <em>shifted forward one day</em>. A <strong>strategy return</strong> is position × the market return that day. Compound those and you have a <strong>cumulative return</strong> to put next to buy-and-hold.</p>
+      <p><strong>Why the shift is the whole game.</strong> You compute today's signal from today's close — which you do not know until the market has shut. You can only act on it tomorrow. <code>Position = Signal.shift()</code> encodes that one-day delay. Leave it out and your backtest trades on information it could not have had, and the returns it reports are fiction. This is look-ahead bias, and it is the single most common way a backtest lies to you.</p>
+      <p><code>np.where(condition, a, b)</code> is a vectorised if/else: <em>a</em> where the condition holds, <em>b</em> where it does not, applied to the whole column at once.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Setup</span>
+        <h3>Build a crossover strategy on META</h3>
+      </div>
+      <p class="exercise-desc">Load the long panel, take META from 2020, and build fast (50-day) and slow (200-day) moving averages. Generate signals, shift into positions, and compute both strategy and market cumulative returns.</p>
+      <div class="cell" id="cell-s8-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s8-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s8-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# YOUR CODE HERE">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s8-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+panel = pd.read_csv('data/SP500_panel.csv')
+panel['datadate'] = pd.to_datetime(panel['datadate'])
+
+meta = panel[panel['tic'] == 'META'].set_index('datadate').sort_index()
+meta = meta.loc['2020':].copy()                     # .copy() — otherwise pandas warns about writing to a slice
+meta['MarketDaily'] = meta['prccd'].pct_change()    # the buy-and-hold return, our benchmark
+
+df = meta.copy()
+df['FastMA'] = df['prccd'].rolling(50).mean()
+df['SlowMA'] = df['prccd'].rolling(200).mean()
+
+df['Signal'] = np.where(df['FastMA'] &gt; df['SlowMA'], 1, -1)   # vectorised if/else over the whole column
+df['Signal'] = np.where(df['SlowMA'].isna(), 0, df['Signal']) # flat during the 200-day warm-up
+
+df['Position'] = df['Signal'].shift()               # ACT TOMORROW on a signal computed from today's close
+df['StratRet'] = df['Position'] * df['MarketDaily']
+df['Strategy'] = (1 + df['StratRet']).cumprod() - 1
+df['Market']   = (1 + df['MarketDaily']).cumprod() - 1
+
+print('Strategy:', f"{df['Strategy'].iloc[-1]:.1%}")
+print('Market:  ', f"{df['Market'].iloc[-1]:.1%}")</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Blink and you'll miss it</span>
+        <h3>Find the crossover dates</h3>
+      </div>
+      <p class="exercise-desc">On which dates did the signal actually flip? The signal only ever holds +1 or −1, so a change from one to the other is a jump of 2.</p>
+      <div class="cell" id="cell-s8-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s8-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s8-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s8-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># the crossovers are represented by 2 or -2.
+df[abs(df['Signal'].diff()) == 2]
+# .diff() gives today minus yesterday: +1 → -1 is -2, and -1 → +1 is +2
+# abs() catches both directions at once; anything else is 0 (no change)</pre></div>
+      </details>
+    </div>
+
+    <div class="concept-box">
+      <p><strong>Your strategy lost to buy-and-hold. That is the correct answer, not a bug.</strong> META ran from roughly $135 to $620 over this period. The crossover rule holds <code>-1</code> — a short position — every time the fast average sits below the slow one, and shorting a stock that quadruples is about as expensive as trading gets. Expect the strategy to finish far behind the market here, and do not go hunting for the mistake.</p>
+      <p>Three things are actually going on. <strong>Shorting in a bull market</strong> does the damage: change the signal to <code>np.where(fast &gt; slow, 1, 0)</code> so you are either long or flat, and the result improves immediately. <strong>Whipsaw</strong> costs you on top of that — every crossover in a sideways stretch is a round trip that pays nothing. And this backtest charges <strong>no transaction costs</strong>, which flatters it: add a realistic fee per trade and most crossover strategies get worse, not better.</p>
+      <p>The honest summary is that a moving average crossover is a <em>trend-following</em> rule. It is designed to give up upside in exchange for getting out of sustained declines, so it tends to lose to buy-and-hold in a straight bull run and earn its keep in a drawdown. Judging it on one stock over one favourable period tells you very little either way — which is precisely why the last lesson in this session is about testing many parameters rather than trusting one.</p>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s8-func">
+    <h2>🔁 Writing Functions</h2>
+    <div class="concept-box">
+      <p>The moment you compute the same thing twice with different arguments, write a function. <code>def name(inputs):</code> opens it, the indented body does the work, and <code>return</code> hands back the result.</p>
+      <p>Beyond avoiding repetition, a function gives the operation a name, so <code>moving_average(prices, 50)</code> says what it does in a way <code>prices.rolling(50).mean()</code> does not. And it becomes the thing you loop over when you want to test many parameter values — which is exactly where this session ends up.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Recycle Reuse</span>
+        <h3>A moving_average function</h3>
+      </div>
+      <p class="exercise-desc">Write a function <code>moving_average</code> taking a column of prices and a window size, returning the rolling mean over that window. Then rebuild the two averages with it.</p>
+      <div class="cell" id="cell-s8-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s8-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s8-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s8-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>def moving_average(prices, window):
+    return prices.rolling(window=window).mean()
+# 'prices' and 'window' are placeholders — they take whatever you pass in when you call it
+
+df['FastMA'] = moving_average(df['prccd'], 50)      # same result as before, but the intent is now explicit
+df['SlowMA'] = moving_average(df['prccd'], 200)
+df[['prccd', 'FastMA', 'SlowMA']].tail()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Data Display</span>
+        <h3>End-of-period returns for every stock</h3>
+      </div>
+      <p class="exercise-desc">Run the same strategy across every ticker in the panel and produce one table of market vs strategy cumulative return per stock.</p>
+      <div class="cell" id="cell-s8-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s8-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s8-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s8-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>rows = []
+for tic, g in panel.set_index('datadate').groupby('tic'):
+    g = g.sort_index().loc['2020':].copy()          # groupby hands you (name, sub-frame) pairs
+    g['MarketDaily'] = g['prccd'].pct_change()
+    g['FastMA'] = moving_average(g['prccd'], 50)
+    g['SlowMA'] = moving_average(g['prccd'], 200)
+    g['Signal'] = np.where(g['FastMA'] &gt; g['SlowMA'], 1, -1)
+    g['Signal'] = np.where(g['SlowMA'].isna(), 0, g['Signal'])
+    g['Position'] = g['Signal'].shift()
+    g['Strategy'] = (1 + g['Position'] * g['MarketDaily']).cumprod() - 1
+    g['Market']   = (1 + g['MarketDaily']).cumprod() - 1
+    g['tic'] = tic
+    rows.append(g)
+
+allstocks = pd.concat(rows)
+result = allstocks.groupby('tic').agg({'Market': 'last', 'Strategy': 'last'})
+# 'last' takes the end-of-period value of each cumulative column
+result['Beat market?'] = result['Strategy'] &gt; result['Market']
+print(result.round(3).sort_values('Strategy', ascending=False))
+print(f"\nStrategy beat buy-and-hold on {result['Beat market?'].sum()} of {len(result)} stocks.")</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s8-bb">
+    <h2>📊 Bollinger Bands</h2>
+    <div class="concept-box">
+      <p>Bollinger Bands wrap a moving average in a channel two standard deviations wide: <code>SMA ± 2 × rolling std</code>. Because the width is driven by recent volatility, the channel widens in turbulent markets and narrows in calm ones.</p>
+      <p>Two opposite strategies read the same bands. <strong>Mean reversion</strong> says a touch of the upper band is overbought — sell it, expecting a snap back. <strong>Breakout</strong> says the opposite: a close above the upper band is strength confirming itself — buy it. The exercise below implements the breakout reading.</p>
+      <p>The pattern for holding a position between signals is worth learning on its own: set the signal only on the days the rule fires, leave every other day as <code>np.nan</code>, then <code>ffill()</code> to carry the last signal forward until the next one replaces it. <code>fillna(0)</code> finally flattens the stretch before the first signal ever fires.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · BB Breakout</span>
+        <h3>Implement and backtest a breakout strategy</h3>
+      </div>
+      <p class="exercise-desc">Build 20-day bands on META. Buy (+1) when the close crosses above the upper band, sell (−1) when it crosses under the lower band, and hold each position until the other signal fires. Then compare against the market and plot both.</p>
+      <div class="cell" id="cell-s8-5">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s8-5')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s8-5')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s8-5"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>bolli = meta.loc['2020':].copy()
+
+bolli['SMA'] = bolli['prccd'].rolling(window=20).mean()
+bolli['Dev'] = bolli['prccd'].rolling(window=20).std()      # rolling standard deviation = recent volatility
+bolli['LowBand']  = bolli['SMA'] - (2 * bolli['Dev'])
+bolli['HighBand'] = bolli['SMA'] + (2 * bolli['Dev'])       # ~95% of moves sit inside +/- 2 std
+
+bolli['Signal'] = np.nan                                    # start empty — most days the rule says nothing
+bolli.loc[bolli['prccd'] &gt; bolli['HighBand'], 'Signal'] = 1   # .loc[mask, col] sets only the matching rows
+bolli.loc[bolli['prccd'] &lt; bolli['LowBand'],  'Signal'] = -1
+bolli['Signal'] = bolli['Signal'].ffill()                   # hold the last signal until a new one fires
+bolli['Signal'] = bolli['Signal'].fillna(0)                 # flat before the very first signal
+
+bolli['Position'] = bolli['Signal'].shift()                 # the one-day delay, again
+bolli['StratRet'] = bolli['Position'] * bolli['MarketDaily']
+bolli['Strategy'] = (1 + bolli['StratRet']).cumprod() - 1
+bolli['Market']   = (1 + bolli['MarketDaily']).cumprod() - 1
+print('Cumulative Strategy Return is', bolli['Strategy'].iloc[-1])
+print('Market Strategy Return is', bolli['Market'].iloc[-1])
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 5))       # 2 rows, 1 column: price above, returns below
+ax1.set_title('A Bollinger Bands Breakout')
+ax1.plot(bolli['LowBand'], color='grey')
+ax1.plot(bolli['HighBand'], color='grey')
+ax1.plot(bolli['prccd'], label='Price')
+
+ax2.plot(bolli['Market'], label='Market')
+ax2.plot(bolli['Strategy'], label='Strategy')
+
+ax1.legend()
+ax2.legend()
+
+plt.show()</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s8-opt">
+    <h2>🎛 Parameter Optimisation</h2>
+    <div class="concept-box">
+      <p>Any strategy with a window size has arbitrary numbers in it. 50 and 200 are convention, not science. Testing a grid of combinations is how you find out whether the rule works or whether you simply picked lucky numbers.</p>
+      <p>An <strong>EMA</strong> — exponential moving average, <code>.ewm(span=n, adjust=False).mean()</code> — weights recent prices more heavily than old ones, so it reacts faster than a simple average of the same length.</p>
+      <p>Two nested <code>for</code> loops give you every combination: the outer loop runs once per fast window, and for each of those the inner loop runs through every slow window.</p>
+      <p><strong>Read the result with suspicion.</strong> Testing nine combinations and reporting the best one is not evidence the strategy works — with enough combinations something always looks good on one sample. The honest test is whether the winner still wins on a period you did not use to choose it. That is the difference between a backtest and a discovery.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Which windows?</span>
+        <h3>Grid-search the EMA crossover</h3>
+      </div>
+      <p class="exercise-desc">The code below tests one fixed pair of windows and performs badly. Modify it to test three fast and three slow windows in combination. Can you beat the Bollinger strategy above?</p>
+      <div class="cell" id="cell-s8-6">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s8-6')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s8-6')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="fast_window, slow_window = 50, 200
+
+ema = meta.loc[&#x27;2020&#x27;:].copy()
+ema[&#x27;FastEMA&#x27;] = ema[&#x27;prccd&#x27;].ewm(span=fast_window, adjust=False).mean()
+ema[&#x27;SlowEMA&#x27;] = ema[&#x27;prccd&#x27;].ewm(span=slow_window, adjust=False).mean()
+
+ema[&#x27;Signal&#x27;] = np.where(ema[&#x27;FastEMA&#x27;] &gt; ema[&#x27;SlowEMA&#x27;], 1, -1)
+ema[&#x27;Signal&#x27;] = np.where(ema[&#x27;SlowEMA&#x27;].isna(), 0, ema[&#x27;Signal&#x27;])
+
+ema[&#x27;Position&#x27;] = ema[&#x27;Signal&#x27;].shift()
+ema[&#x27;StratRet&#x27;] = ema[&#x27;Position&#x27;] * ema[&#x27;MarketDaily&#x27;]
+ema[&#x27;Strategy&#x27;] = (1 + ema[&#x27;StratRet&#x27;]).cumprod() - 1
+
+print(&#x27;Short window:&#x27;, fast_window, &#x27;Long window:&#x27;, slow_window)
+print(&#x27;Cumulative Strategy Return is&#x27;, ema[&#x27;Strategy&#x27;].iloc[-1])
+
+# MODIFY THIS CODE to test 3 fast x 3 slow windows in combination">fast_window, slow_window = 50, 200
+
+ema = meta.loc['2020':].copy()
+ema['FastEMA'] = ema['prccd'].ewm(span=fast_window, adjust=False).mean()
+ema['SlowEMA'] = ema['prccd'].ewm(span=slow_window, adjust=False).mean()
+
+ema['Signal'] = np.where(ema['FastEMA'] &gt; ema['SlowEMA'], 1, -1)
+ema['Signal'] = np.where(ema['SlowEMA'].isna(), 0, ema['Signal'])
+
+ema['Position'] = ema['Signal'].shift()
+ema['StratRet'] = ema['Position'] * ema['MarketDaily']
+ema['Strategy'] = (1 + ema['StratRet']).cumprod() - 1
+
+print('Short window:', fast_window, 'Long window:', slow_window)
+print('Cumulative Strategy Return is', ema['Strategy'].iloc[-1])
+
+# MODIFY THIS CODE to test 3 fast x 3 slow windows in combination</textarea>
+        <div class="cell-output" id="output-cell-s8-6"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>fast_windows = [7, 20, 50]
+slow_windows = [50, 100, 200]
+
+ema = meta.loc['2020':].copy()
+ema['Market'] = (1 + ema['MarketDaily']).cumprod() - 1
+print('End of period cumulative market return:', ema['Market'].iloc[-1])
+
+results = []
+for fast_window in fast_windows:                    # outer loop: each fast window
+    for slow_window in slow_windows:                # inner loop: every slow window, for each fast one
+        if fast_window &gt;= slow_window:
+            continue                                # a "fast" average must be shorter than the slow one
+        ema['FastEMA'] = ema['prccd'].ewm(span=fast_window, adjust=False).mean()
+        ema['SlowEMA'] = ema['prccd'].ewm(span=slow_window, adjust=False).mean()
+        # .ewm() weights recent prices more heavily, so it turns faster than .rolling()
+
+        ema['Signal'] = np.where(ema['FastEMA'] &gt; ema['SlowEMA'], 1, -1)
+        ema['Signal'] = np.where(ema['SlowEMA'].isna(), 0, ema['Signal'])
+
+        ema['Position'] = ema['Signal'].shift()
+        ema['StratRet'] = ema['Position'] * ema['MarketDaily']
+        ema['Strategy'] = (1 + ema['StratRet']).cumprod() - 1
+
+        results.append({'Fast': fast_window, 'Slow': slow_window,
+                        'Return': ema['Strategy'].iloc[-1]})
+        print('Short window:', fast_window, 'Long window:', slow_window)
+        print('Cumulative Strategy Return is', ema['Strategy'].iloc[-1])
+
+table = pd.DataFrame(results).sort_values('Return', ascending=False)
+print('\nRanked:')
+print(table.round(3).to_string(index=False))
+print('\nBest combination is the top row — but see the warning above about picking winners after the fact.')</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 9                   ║ -->
+<!-- ╚══════════════════════════════╝ -->
+</div><!-- /sec-s8 -->
+
+<div class="page-section" id="sec-s9">
+
+  <div class="session-hero">
+    <div class="hero-num">9</div>
+    <div>
+      <h1>Portfolios &amp; Optimisation</h1>
+      <p>Nobody holds one stock. This session builds a portfolio from several, measures its risk-adjusted return with the Sharpe ratio, and then solves for the weights that maximise it.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s9', this)">▶ Run All</button>
+  </div>
+
+  <div class="lesson" id="s9-form">
+    <h2>🧺 Building a Portfolio</h2>
+    <div class="concept-box">
+      <p>A portfolio is several securities held together, each with a <strong>weight</strong> — the share of your money in it. Weights sum to 1. A <strong>1/N</strong> or equal-weighted portfolio simply splits the money evenly, and it is a much harder benchmark to beat than it looks.</p>
+      <p>The portfolio return on any day is the weighted average of the individual returns. <code>returns.dot(weights)</code> does that in one step: the dot product multiplies each stock's return by its weight and sums across the row, giving one portfolio return per day.</p>
+      <p><code>.isin(list)</code> filters rows whose value appears anywhere in a list — the clean way to pull a handful of tickers out of a panel without chaining a dozen <code>|</code> conditions.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Filter a portfolio</span>
+        <h3>Pick five stocks out of the panel</h3>
+      </div>
+      <p class="exercise-desc">Load <code>data/SP500_2025.csv</code> and build a new frame containing only TSLA, MSFT, AMZN, META and NVDA.</p>
+      <div class="cell" id="cell-s9-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s9-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s9-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# YOUR CODE HERE">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s9-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Specify your tickers
+tickers = ['TSLA', 'MSFT', 'AMZN', 'META', 'NVDA']
+
+# Download them across some date range
+data = pd.read_csv('data/SP500_2025.csv')
+data['datadate'] = pd.to_datetime(data['datadate'])
+
+# Filter using boolean indexing
+df = data[data['tic'].isin(tickers)]
+# .isin() tests membership of a list — far cleaner than tic=='TSLA' | tic=='MSFT' | ...
+
+print('Rows:', len(df), '| tickers:', sorted(df['tic'].unique()))
+df.head()</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Equal-weight the five and measure it</h3>
+      </div>
+      <p class="exercise-desc">Pivot to a wide returns matrix, build equal weights, and compute the portfolio's annualised return and volatility. Annualise by multiplying the daily mean by 252 and the daily standard deviation by √252.</p>
+      <div class="cell" id="cell-s9-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s9-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s9-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s9-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>prices = df.pivot(index='datadate', columns='tic', values='prccd')
+returns = prices.pct_change().dropna()              # wide returns matrix: one column per stock
+
+init_weights = np.array([1/len(tickers)] * len(tickers))
+# 1/N: five stocks → 0.2 each. np.array so it works with .dot()
+print('Weights:', dict(zip(returns.columns, init_weights)))
+
+init_portfolio_returns = returns.dot(init_weights)
+# .dot() multiplies each stock's return by its weight and sums ACROSS each row
+# result: one portfolio return per day
+
+annualised_return = init_portfolio_returns.mean() * 252
+# 252 trading days in a year; returns scale linearly with time
+annualised_volatility = init_portfolio_returns.std() * np.sqrt(252)
+# volatility scales with the SQUARE ROOT of time, not linearly — this is why sqrt(252)
+
+print(f'\nAnnualised return:     {annualised_return:.2%}')
+print(f'Annualised volatility: {annualised_volatility:.2%}')</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s9-sharpe">
+    <h2>⚖️ The Sharpe Ratio</h2>
+    <div class="concept-box">
+      <p>Return alone is not a result — you can always get more of it by taking more risk. The <strong>Sharpe ratio</strong> asks how much excess return you earned per unit of volatility:</p>
+      <p><code>Sharpe = (Rp − Rf) / σp</code>, where <code>Rp</code> is the annualised portfolio return, <code>Rf</code> the risk-free rate, and <code>σp</code> the annualised volatility.</p>
+      <p>Subtracting <code>Rf</code> matters: a portfolio returning 4% when Treasury bills pay 4.5% has earned <em>nothing</em> for the risk it took, and its Sharpe is negative. Loosely, above 1 is good, above 2 is very good, and anything above 3 on a backtest is usually a bug, a look-ahead leak, or a period too short to mean anything.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Looking Sharpe</span>
+        <h3>Compute the Sharpe ratio</h3>
+      </div>
+      <p class="exercise-desc">Apply the formula with a risk-free rate of 4.5%.</p>
+      <div class="cell" id="cell-s9-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s9-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s9-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s9-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>risk_free_rate = 0.045                              # annual, so it matches the annualised figures
+
+sharpe_ratio = (annualised_return - risk_free_rate) / annualised_volatility
+print(f'Sharpe ratio: {sharpe_ratio:.3f}')
+# excess return per unit of risk — subtracting Rf is what makes it "excess"
+
+for t in returns.columns:                           # each stock on its own, for comparison
+    r, v = returns[t].mean() * 252, returns[t].std() * np.sqrt(252)
+    print(f'  {t:5} return {r:7.2%}  vol {v:6.2%}  Sharpe {(r - risk_free_rate) / v:6.3f}')
+print(f'\n  1/N   return {annualised_return:7.2%}  vol {annualised_volatility:6.2%}  Sharpe {sharpe_ratio:6.3f}')
+print('\nNote the portfolio volatility is below most individual stocks — that gap is diversification.')</pre></div>
+      </details>
+    </div>
+
+  </div>
+
+  <div class="lesson" id="s9-opt">
+    <h2>🎯 Optimising the Weights</h2>
+    <div class="concept-box">
+      <p>Equal weights are arbitrary. <strong>scipy</strong>'s <code>minimize</code> searches for the weights giving the best Sharpe — it loads on first use like the other heavy libraries.</p>
+      <p><code>minimize</code> only ever minimises, so to maximise Sharpe you minimise <em>negative</em> Sharpe. That sign flip is the standard trick and the easiest thing to get wrong.</p>
+      <p>Two things keep the answer sensible. A <strong>constraint</strong> that weights sum to 1 keeps you fully invested, and <strong>bounds</strong> of (0, 1) per weight forbid short positions. Drop the bounds and the optimiser will happily propose shorting one stock 300% to fund another.</p>
+      <p><strong>The catch worth stating plainly.</strong> These weights are optimal <em>for the period you fitted them on</em>, and they are fitted to estimates of return and covariance that are themselves noisy. Out of sample, optimised weights routinely lose to 1/N. What follows is how the machinery works — not a recommendation to trade it.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Solve for the maximum-Sharpe weights</h3>
+      </div>
+      <p class="exercise-desc">Write a function returning negative Sharpe for a given weight vector, then minimise it subject to weights summing to 1 and each sitting between 0 and 1.</p>
+      <div class="cell" id="cell-s9-4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s9-4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s9-4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s9-4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>from scipy.optimize import minimize               # loads on first use — one-off pause
+
+def neg_sharpe(weights, returns, rf):
+    port = returns.dot(weights)                     # daily portfolio returns for these weights
+    r = port.mean() * 252
+    v = port.std() * np.sqrt(252)
+    return -(r - rf) / v                            # NEGATIVE, because minimize() only minimises
+
+n = len(tickers)
+constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+# 'eq' means this expression must equal zero, i.e. the weights must sum to exactly 1
+bounds = tuple((0, 1) for _ in range(n))
+# each weight between 0 and 1 — no shorting, no leverage
+
+result = minimize(neg_sharpe, init_weights, args=(returns, risk_free_rate),
+                  method='SLSQP', bounds=bounds, constraints=constraints)
+# SLSQP is the standard method when you have both bounds and constraints
+# init_weights is the starting guess; args passes the extra inputs through to neg_sharpe
+
+optimal_weights = result.x                          # .x holds the winning weight vector
+print('Optimal weights:')
+for t, w in zip(returns.columns, optimal_weights):
+    print(f'  {t:5} {w:6.1%}')
+print(f'\nMaximum Sharpe: {-result.fun:.3f}')       # flip the sign back to read it as a Sharpe
+print(f'Versus 1/N:     {sharpe_ratio:.3f}')</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original · Watch your back</span>
+        <h3>Backtest the optimal weights</h3>
+      </div>
+      <p class="exercise-desc">Use <code>optimal_weights</code> to compute new portfolio returns and volatility. How do the annualised figures compare with the 1/N portfolio you started with?</p>
+      <div class="cell" id="cell-s9-5">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s9-5')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s9-5')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s9-5"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>opt_portfolio_returns = returns.dot(optimal_weights)
+opt_portfolio_std_dev = opt_portfolio_returns.std()
+
+annualised_return = opt_portfolio_returns.mean() * 252
+annualised_volatility = opt_portfolio_std_dev * np.sqrt(252)
+
+print("Annualised portfolio returns, volatility", annualised_return, annualised_volatility)
+
+# Side by side with the equal-weight portfolio
+print(f'\n{"":12}{"Return":&gt;10}{"Vol":&gt;10}{"Sharpe":&gt;10}')
+for name, r in [('1/N', init_portfolio_returns), ('Optimised', opt_portfolio_returns)]:
+    ar, av = r.mean() * 252, r.std() * np.sqrt(252)
+    print(f'{name:12}{ar:&gt;10.2%}{av:&gt;10.2%}{(ar - risk_free_rate) / av:&gt;10.3f}')</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Original</span>
+        <h3>Plot both cumulative return paths</h3>
+      </div>
+      <p class="exercise-desc">Plot the optimal-weight and equal-weight cumulative returns together to see how the optimisation did against its benchmark.</p>
+      <div class="cell" id="cell-s9-6">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s9-6')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s9-6')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s9-6"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># Calculate the portfolio and cumulative returns for the 1/N portfolio
+init_portfolio_returns = returns.dot(init_weights)
+init_cumulative_returns = (1 + init_portfolio_returns).cumprod() - 1
+
+# Calculate the cumulative returns for the optimal portfolio
+opt_cumulative_returns = (1 + opt_portfolio_returns).cumprod() - 1
+
+# Plotting the cumulative returns
+plt.figure(figsize=(10, 3))
+plt.plot(opt_cumulative_returns, label="Optimised Cumulative Return")
+plt.plot(init_cumulative_returns, label="Equal Weight Cumulative Return")
+plt.legend()
+plt.show()
+
+print(f'Optimised final: {opt_cumulative_returns.iloc[-1]:.2%}')
+print(f'1/N final:       {init_cumulative_returns.iloc[-1]:.2%}')
+print('\nThe optimiser saw this whole period before choosing its weights, so it should win here.')
+print('The real test is a period it never saw — split the year and refit on the first half to try it.')</pre></div>
+      </details>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">⚠️</span>
+      <div>This is in-sample optimisation: the weights were chosen using the same data they are judged on. Out of sample, 1/N beats optimised weights more often than the maths suggests it should — estimation error in expected returns is large, and the optimiser amplifies it.</div>
+    </div>
+
+  </div>
+</div><!-- /sec-s9 -->
+
 </main>
 
 <!-- ── AI PANEL ── -->
@@ -2370,6 +4285,69 @@ for _i, (_tk, (_p0, _sig, _vbase, _moneff)) in enumerate(_fs_specs.items()):
 
     _fs_store[f'data/{_tk}_2025_raw.csv'] = _d.to_csv(index=False)
 
+# ── S&P panel (Compustat-style) — built on first use ─
+# tic: (name, exchange, sector, 2019 price, 2025 price, daily vol, base volume,
+#       market loading, sector loading)
+_SP = {
+ 'AAPL' :('APPLE INC',              14,'TECH',   39.0,  255.0,0.019, 95e6,.42,.55),
+ 'MSFT' :('MICROSOFT CORP',         14,'TECH',   99.0,  420.0,0.017, 28e6,.46,.68),
+ 'GOOGL':('ALPHABET INC  -CL A',    14,'TECH',   52.0,  190.0,0.018, 28e6,.46,.68),
+ 'GOOG' :('ALPHABET INC  -CL C',    14,'TECH',   52.5,  192.0,0.018, 21e6,.45,.66),
+ 'AMZN' :('AMAZON.COM INC',         14,'TECH',   76.0,  225.0,0.021, 48e6,.40,.50),
+ 'NVDA' :('NVIDIA CORP',            14,'SEMI',    3.4,  145.0,0.031,320e6,.38,.58),
+ 'AVGO' :('BROADCOM INC',           14,'SEMI',   25.0,  235.0,0.024, 28e6,.38,.58),
+ 'META' :('META PLATFORMS INC',     14,'SOCIAL',135.0,  620.0,0.024, 19e6,.40,.30),
+ 'TSLA' :('TESLA INC',              14,'AUTO',   20.7,  400.0,0.039, 98e6,.35,.25),
+ 'NFLX' :('NETFLIX INC',            14,'MEDIA', 268.0, 1180.0,0.025,4.2e6,.38,.30),
+ 'COST' :('COSTCO WHOLESALE CORP',  14,'CONS',  204.0,  950.0,0.014,2.1e6,.36,.48),
+ 'WMT'  :('WALMART INC',            11,'CONS',   31.0,   95.0,0.013, 17e6,.34,.48),
+ 'JPM'  :('JPMORGAN CHASE & CO',    11,'FIN',    97.0,  240.0,0.016,10.5e6,.46,.55),
+ 'UNH'  :('UNITEDHEALTH GROUP INC', 11,'HLTH',  245.0,  340.0,0.017,3.4e6,.30,.45),
+ 'JNJ'  :('JOHNSON & JOHNSON',      11,'HLTH',  129.0,  155.0,0.011,7.0e6,.30,.45),
+ 'XOM'  :('EXXON MOBIL CORP',       11,'ENGY',   68.0,  115.0,0.017, 17e6,.28,.55),
+ 'NVR'  :('NVR INC',                11,'HOME', 2600.0, 7800.0,0.018, 32e3,.34,.50),
+ 'BKNG' :('BOOKING HOLDINGS INC',   14,'TRVL', 1720.0, 5200.0,0.021,320e3,.36,.40),
+ 'AZO'  :('AUTOZONE INC',           11,'CONS',  838.0, 3600.0,0.015,180e3,.30,.40),
+ 'FICO' :('FAIR ISAAC CORP',        11,'TECH',  190.0, 1900.0,0.026,420e3,.34,.35),
+}
+
+def _build_panel():
+    _d = pd.date_range('2019-01-02', '2025-12-31', freq='B')
+    _n = len(_d)
+    _rng = np.random.default_rng(4242)
+    _mkt = _rng.normal(0, 1, _n)                       # one shared market factor
+    _sec = {s: _rng.normal(0, 1, _n) for s in {v[2] for v in _SP.values()}}
+    _out = []
+    for _i, (_tic, (_nm, _ex, _sc, _p0, _p1, _sg, _vb, _wm, _ws)) in enumerate(_SP.items()):
+        _r2 = np.random.default_rng(5000 + _i)
+        _wi = np.sqrt(max(1e-9, 1 - _wm**2 - _ws**2))  # idiosyncratic share keeps total variance at 1
+        _z  = _wm*_mkt + _ws*_sec[_sc] + _wi*_r2.normal(0, 1, _n)
+        _pt = np.cumprod(1 + _z*_sg)
+        _pt = _pt / _pt[-1] * (_p1/_p0)                # pin the last price to its 2025 target
+        _c  = _p0*_pt
+        _o  = _c*(1 + _r2.normal(0, 0.004, _n))
+        _h  = np.maximum(_o,_c)*(1 + np.abs(_r2.normal(0, 0.0068, _n)))
+        _l  = np.minimum(_o,_c)*(1 - np.abs(_r2.normal(0, 0.0068, _n)))
+        _v  = (_vb + _r2.exponential(_vb*0.5, _n))/(1 + 0.3*np.arange(_n)/_n)
+        _out.append(pd.DataFrame({
+            'datadate': _d.strftime('%Y-%m-%d'), 'tic': _tic, 'conm': _nm, 'exchg': _ex,
+            'prcod': _o.round(2), 'prchd': _h.round(2), 'prcld': _l.round(2),
+            'prccd': _c.round(2), 'cshtrd': _v.round(0)}))
+    return pd.concat(_out, ignore_index=True).sort_values(['datadate','tic']).reset_index(drop=True)
+
+# ── Two-stock file for the regression session ────────
+def _build_pair():
+    _p = _panel_cached()
+    _w = _p[_p.tic.isin(['AAPL','GOOG'])].pivot(index='datadate', columns='tic', values='prccd')
+    _w.columns = [c + '.Close' for c in _w.columns]
+    return _w.reset_index().rename(columns={'datadate': 'Date'})
+
+_panel_memo = {}
+def _panel_cached():
+    if 'p' not in _panel_memo:
+        _panel_memo['p'] = _build_panel()
+    return _panel_memo['p']
+
 # ── Patch pd.read_csv ────────────────────────────────
 _orig_read_csv = pd.read_csv
 _csv_store = {
@@ -2377,9 +4355,31 @@ _csv_store = {
     'data/AAPL_2026_raw.csv': _csv26,
 }
 _csv_store.update(_fs_store)
+
+# Built only when first read, so the page starts fast
+_df_factories = {
+    'data/SP500_2025.csv':  lambda: _panel_cached()[_panel_cached().datadate >= '2025-01-01'].reset_index(drop=True),
+    'data/SP500_panel.csv': lambda: _panel_cached(),
+    'data/NVDA_2025.csv':   lambda: (lambda _t: _t.rename(columns={
+                                'datadate':'Date','prcod':'Open','prchd':'High',
+                                'prcld':'Low','prccd':'Close','cshtrd':'Volume'}
+                                )[['Date','Open','High','Low','Close','Volume']].reset_index(drop=True)
+                             )(_panel_cached().query("tic=='NVDA' and datadate>='2023-01-01'")),
+    'data/trading_data.csv': _build_pair,
+}
+_df_memo = {}
+
 def _read_csv(path, **kw):
-    if isinstance(path, str) and path in _csv_store:
-        return _orig_read_csv(StringIO(_csv_store[path]), **kw)
+    if isinstance(path, str):
+        if path in _csv_store:
+            return _orig_read_csv(StringIO(_csv_store[path]), **kw)
+        if path in _df_factories:
+            if path not in _df_memo:
+                _df_memo[path] = _df_factories[path]()
+            _d = _df_memo[path]
+            if kw:   # let real parsing handle usecols/parse_dates/etc.
+                return _orig_read_csv(StringIO(_d.to_csv(index=False)), **kw)
+            return _d.copy()
     return _orig_read_csv(path, **kw)
 pd.read_csv = _read_csv
 
@@ -2423,6 +4423,36 @@ async function initPyodide() {
 }
 
 // ══════════════════════════════════════════════════════
+//  Lazy package loading
+//  seaborn / statsmodels / scipy are big. Load them the
+//  first time a cell actually needs one, not at startup.
+// ══════════════════════════════════════════════════════
+const PKG_LOADED = new Set(['pandas', 'numpy', 'matplotlib']);
+const PKG_TRIGGERS = [
+  [/\bimport\s+seaborn\b|\bsns\./,                         'seaborn'],
+  [/\bimport\s+statsmodels|\bstatsmodels\.|\bsmf?\./,      'statsmodels'],
+  [/\bimport\s+scipy\b|\bscipy\.|\bfrom\s+scipy\b/,        'scipy'],
+];
+
+async function ensurePackagesFor(code) {
+  const needed = PKG_TRIGGERS
+    .filter(([re, pkg]) => re.test(code) && !PKG_LOADED.has(pkg))
+    .map(([, pkg]) => pkg);
+  if (!needed.length) return;
+
+  const prev = document.getElementById('status-text').textContent;
+  setStatus('Loading ' + needed.join(', ') + '… (first time only)');
+  try {
+    await pyodide.loadPackage(needed);
+    needed.forEach(p => PKG_LOADED.add(p));
+    setStatus(prev);
+  } catch (e) {
+    setStatus('❌ could not load ' + needed.join(', '));
+    throw e;
+  }
+}
+
+// ══════════════════════════════════════════════════════
 //  Cell Runner
 // ══════════════════════════════════════════════════════
 async function runCell(cellId) {
@@ -2437,6 +4467,16 @@ async function runCell(cellId) {
   outputDiv.innerHTML = '<div class="out-text" style="color:var(--text3)">Running…</div>';
 
   const userCode = textarea.value;
+
+  // Pull in seaborn / statsmodels / scipy if this cell is the first to need them
+  try {
+    await ensurePackagesFor(userCode);
+  } catch (e) {
+    renderOutput('Internal error: could not load a required package.\n' + String(e), outputDiv, true);
+    runBtn.disabled = false; runBtn.textContent = '▶ Run';
+    return;
+  }
+
   // Pass code via globals (most reliable method in Pyodide)
   pyodide.globals.set('_USER_CODE', userCode);
 
