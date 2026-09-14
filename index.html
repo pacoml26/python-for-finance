@@ -5553,7 +5553,10 @@ async function sendAIMessage() {
     addAIMessage('ai', reply);
   } catch(e) {
     document.getElementById(thinkingId)?.remove();
-    addAIMessage('ai', `❌ Error: ${e.message}. Check your API key or provider.`);
+    const msg = /failed to fetch|networkerror|load failed/i.test(e.message)
+      ? "❌ The request never left the browser. That is usually a network block rather than a bad key — check you are online, and that an ad-blocker or VPN is not blocking the API."
+      : '❌ ' + e.message;
+    addAIMessage('ai', msg);
   }
 
   document.getElementById('ai-send').disabled = false;
@@ -5699,7 +5702,12 @@ Focus on pandas, numpy, and the AAPL stock data exercises they're working on.`;
       max_tokens: 800
     })
   });
-  if (!resp.ok) throw new Error(`OpenAI: ${resp.status} ${await resp.text()}`);
+  if (!resp.ok) {
+    const body = await resp.text();
+    if (resp.status === 401) throw new Error('Key rejected (401). Check you pasted the whole sk-... key.');
+    if (resp.status === 429) throw new Error('Rate limited or out of credit (429). Check Billing on the OpenAI platform.');
+    throw new Error(`OpenAI ${resp.status}: ${body.slice(0, 300)}`);
+  }
   const data = await resp.json();
   return data.choices[0].message.content;
 }
@@ -5716,7 +5724,7 @@ Focus on pandas, numpy, and the AAPL stock data exercises they're working on.`;
       'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
       'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-ipc': 'true'
+      'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5',
@@ -5725,7 +5733,13 @@ Focus on pandas, numpy, and the AAPL stock data exercises they're working on.`;
       messages: history
     })
   });
-  if (!resp.ok) throw new Error(`Anthropic: ${resp.status} ${await resp.text()}`);
+  if (!resp.ok) {
+    const body = await resp.text();
+    if (resp.status === 401) throw new Error('Key rejected (401). Check you pasted the whole sk-ant-... key.');
+    if (resp.status === 400 && /credit/i.test(body)) throw new Error('No credit on the account. Add credit under Billing in the Anthropic console.');
+    if (resp.status === 429) throw new Error('Rate limited (429). Wait a moment, or pause Watch.');
+    throw new Error(`Anthropic ${resp.status}: ${body.slice(0, 300)}`);
+  }
   const data = await resp.json();
   return data.content[0].text;
 }
