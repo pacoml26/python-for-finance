@@ -1355,8 +1355,12 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
     <div class="concept-box">
       <p><strong>Why sort?</strong> If dates are out of order, any rolling calculation (like a moving average) will be wrong. We first convert the Date column with <code>pd.to_datetime()</code> — this turns a text string like <code>"02/01/2026"</code> into a real date Python can sort and compare. The option <code>dayfirst=True</code> tells pandas the format is DD/MM/YYYY, not MM/DD/YYYY.</p>
       <p><strong>Why copy?</strong> <code>df = df_raw.copy()</code> creates a completely independent copy of the data. Without it, changes to <code>df</code> would silently modify <code>df_raw</code> too — always copy before cleaning.</p>
-      <p><strong>Why we re-assign instead of using <code>inplace=True</code>.</strong> Most pandas methods return a <em>new</em> DataFrame and leave the original untouched, so you write <code>df = df.sort_index()</code>. Many methods also accept <code>inplace=True</code>, which modifies the DataFrame directly and returns nothing. It looks like it saves a line — but <strong>this course re-assigns every time</strong>, and so should you.</p>
-      <p>Three reasons. Re-assigning <strong>chains</strong>: <code>df.drop_duplicates().sort_index()</code> reads as one pipeline, while <code>inplace</code> versions cannot be chained at all because each returns <code>None</code>. It also fails loudly — the classic <code>inplace</code> bug is writing <code>df = df.sort_index(inplace=True)</code>, which silently sets <code>df</code> to <code>None</code> and breaks every cell after it. And <code>inplace</code> is on its way out: pandas is deprecating it, so code written with it now will start raising warnings.</p>
+      <p><strong>Two ways to change a DataFrame — you need to recognise both.</strong> Most pandas methods build a <em>new</em> DataFrame and hand it back, leaving the original untouched. So the change only sticks if you catch the result:</p>
+      <p><code>df = df.sort_index()</code> &nbsp;— <strong>re-assign.</strong> The method returns the sorted DataFrame; <code>df =</code> points the name at it.<br>
+      <code>df.sort_index(inplace=True)</code> &nbsp;— <strong>in place.</strong> The method edits <code>df</code> directly and returns <code>None</code>. No <code>df =</code>, because there is nothing to catch.</p>
+      <p>Both leave <code>df</code> sorted. Most cleaning methods accept the argument — <code>sort_index</code>, <code>set_index</code>, <code>drop</code>, <code>drop_duplicates</code>, <code>fillna</code>, <code>reset_index</code>, <code>rename</code> — and you will meet <code>inplace=True</code> constantly in older notebooks and on Stack Overflow, which is why it is worth being able to read.</p>
+      <p><strong>Which to use: re-assign.</strong> Three reasons. It <strong>chains</strong> — <code>df.drop_duplicates().sort_index()</code> reads as one pipeline, while the <code>inplace</code> versions cannot chain at all, because each one returns <code>None</code> and you would be calling <code>.sort_index()</code> on nothing. It <strong>fails loudly</strong> — the classic bug is writing <code>df = df.sort_index(inplace=True)</code>, mixing the two styles, which quietly sets <code>df</code> to <code>None</code> and breaks every cell below with a baffling error. And it is <strong>the way pandas is going</strong>: <code>inplace</code> is being deprecated, so code written with it today will start raising warnings.</p>
+      <p>It does not even save memory, which is the usual justification — pandas generally builds the new object internally either way. So: know it when you read it, and re-assign when you write it. The exercise after this one lets you try both.</p>
       <p><strong>Why remove duplicates?</strong> If the same date appears twice, averages and sums will be inflated. <code>drop_duplicates()</code> keeps the first occurrence of any repeated row and removes the rest.</p>
     </div>
 
@@ -1399,12 +1403,68 @@ df</textarea>
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>df = df_raw.copy()                                       # make an independent copy — changes to df won't touch df_raw
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)   # convert text dates to datetime; dayfirst=True because format is DD/MM/YYYY
-df = df.set_index('Date')                                # make Date the row index; re-assign rather than inplace=True
+df = df.set_index('Date')                                # make Date the row index (the inplace= version is shown below)
 df = df.sort_index()                                     # sort rows oldest → newest by their date index
 df = df.drop(columns=['Dividends', 'Stock Splits'])      # columns= is required, or pandas looks for ROWS with those labels
 df = df.drop_duplicates()                                # delete any row that is an exact copy of an earlier row
 print(f'Removed {len(df_raw) - len(df)} duplicate rows')  # f-string: shows how many rows were cut
-df                                                       # display the cleaned table</pre></div>
+df                                                       # display the cleaned table
+
+
+# ── The same cleaning written with inplace=True ──────────────────
+# Identical result. Note there is no "df =" on these lines.
+#
+# df = df_raw.copy()
+# df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+# df.set_index('Date', inplace=True)
+# df.sort_index(inplace=True)
+# df.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+# df.drop_duplicates(inplace=True)</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Try both styles — and set off the trap</h3>
+      </div>
+      <p class="exercise-desc">Write the same operation three ways: re-assigned, in place, and the broken hybrid that mixes them. The third one is the bug you will eventually write by accident, so it is worth seeing the error message now, while you know what caused it.</p>
+      <div class="cell" id="cell-s2-3c">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2-3c')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2-3c')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2-3c"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre># 1. Re-assigning — the method returns a sorted copy, and df = catches it
+a = df_raw.copy()
+a = a.sort_values('Volume')
+print('re-assign  → rows:', len(a), '| type:', type(a).__name__)
+
+# 2. In place — the method edits 'b' directly and returns nothing, so there is no df =
+b = df_raw.copy()
+b.sort_values('Volume', inplace=True)
+print('inplace    → rows:', len(b), '| type:', type(b).__name__)
+print('same result?', a.equals(b))        # .equals() compares two DataFrames cell by cell
+
+# 3. The trap: mixing both styles in one line
+c = df_raw.copy()
+c = c.sort_values('Volume', inplace=True)
+# inplace=True sorts c, then returns None — and "c =" overwrites c WITH that None
+print('hybrid     → c is now:', c)        # prints None; c is no longer a DataFrame
+
+try:
+    len(c)                                # anything you do with c from here on fails
+except TypeError as e:
+    print('and using it raises:', type(e).__name__, '-', e)
+# The error surfaces on whatever line touches c NEXT, not on the line that broke it,
+# which is why this one is so annoying to track down in a long notebook.</pre></div>
       </details>
     </div>
 
