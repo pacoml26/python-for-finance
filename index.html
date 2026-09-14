@@ -597,6 +597,22 @@ details.solution[open] summary { border-bottom: 1px solid var(--border); }
       <span class="nav-dot"></span>Data Types
     </button>
   </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-title">Session 2b</div>
+    <button class="nav-item" onclick="nav('s2b','s2b-brief')">
+      <span class="nav-dot"></span>Group Exercise
+    </button>
+    <button class="nav-item" onclick="nav('s2b','s2b-clean')">
+      <span class="nav-dot"></span>Clean Your File
+    </button>
+    <button class="nav-item" onclick="nav('s2b','s2b-analysis')">
+      <span class="nav-dot"></span>The Five Figures
+    </button>
+    <button class="nav-item" onclick="nav('s2b','s2b-debrief')">
+      <span class="nav-dot"></span>Team Debrief
+    </button>
+  </div>
 </nav>
 
 <!-- MAIN CONTENT -->
@@ -1047,12 +1063,19 @@ print(f'Q4 above-average days: {q4}')</textarea>
       <details class="solution">
         <summary>Show Solution</summary>
         <div class="solution-body"><pre>mask = df['Close'] > df['Close'].mean()  # True for days where Close beats the full-year average
-q3 = mask[mask.index.to_period('Q') == '2025Q3'].sum()
-# mask.index.to_period('Q') converts each date to its quarter label ('2025Q3', '2025Q4', etc.)
-# == '2025Q3' filters to only Q3 dates; .sum() then counts the Trues in that subset
-q4 = mask[mask.index.to_period('Q') == '2025Q4'].sum()  # same for Q4
-print(f'Q3 above-average days: {q3}')
-print(f'Q4 above-average days: {q4}')</pre></div>
+
+# ── Approach 1: slice the mask by date range (simplest) ──
+q3 = mask.loc['2025-07':'2025-09']       # a mask keeps the date index, so .loc slices it like any Series
+q4 = mask.loc['2025-10':'2025-12']       # with .loc BOTH ends are included, unlike normal Python slicing
+print('Q3', q3.sum())                    # .sum() counts the Trues, because True == 1 and False == 0
+print('Q4', q4.sum())
+
+# ── Approach 2: match on the quarter label ──
+quarters = mask.index.to_period('Q')     # turns each date into its quarter: 2025-08-14 → '2025Q3'
+print('Q3', mask[quarters == '2025Q3'].sum())
+print('Q4', mask[quarters == '2025Q4'].sum())
+# comparing quarters to a string gives a second mask, used here to filter the first one
+# more typing than approach 1, but it survives a change of year — no hard-coded month boundaries</pre></div>
       </details>
     </div>
 
@@ -1729,6 +1752,409 @@ print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.
 
 </div><!-- /sec-s2a -->
 
+<!-- ╔══════════════════════════════╗ -->
+<!-- ║  SESSION 2b — GROUP EXERCISE ║ -->
+<!-- ╚══════════════════════════════╝ -->
+<div class="page-section" id="sec-s2b">
+
+  <div class="session-hero">
+    <div class="hero-num">2b</div>
+    <div>
+      <h1>Group Exercise — Food Service Sector</h1>
+      <p>You are a team of analysts at a financial firm. Each of you takes one restaurant stock, cleans it, and works out the same five figures. Then you come back together and argue for the one your firm should buy.</p>
+    </div>
+    <button class="run-all-btn" disabled onclick="runAllInSection('sec-s2b', this)">▶ Run All</button>
+  </div>
+
+  <!-- ── Brief ── -->
+  <div class="lesson" id="s2b-brief">
+    <h2>📋 The Brief</h2>
+    <div class="concept-box">
+      <p>You have the raw 2025 trading data for five food service companies. <strong>As a team, decide who takes which company</strong> — if you are fewer than five, just take one each and leave the rest.</p>
+      <p><strong>MCD</strong> McDonald's &nbsp;·&nbsp; <strong>SBUX</strong> Starbucks &nbsp;·&nbsp; <strong>CMG</strong> Chipotle &nbsp;·&nbsp; <strong>DPZ</strong> Domino's Pizza &nbsp;·&nbsp; <strong>WEN</strong> Wendy's</p>
+      <p>Clean your own file, then work out these five things and <strong>write the figures somewhere your team can see them</strong>:</p>
+      <p>1. Total volume traded over the year &nbsp;·&nbsp; 2. Highest and lowest close, and the dates they happened &nbsp;·&nbsp; 3. Average closing price in January, and again in December &nbsp;·&nbsp; 4. Whether Mondays saw heavier trading than a typical day &nbsp;·&nbsp; 5. Whether the year's final close sat nearer the high or the low of the year</p>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡</span>
+      <div>Everyone's answers will be <strong>different</strong> — that is the point. The comparison only works if each of you actually runs your own ticker.</div>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Step 1</span>
+        <h3>Pick your ticker and load the raw file</h3>
+      </div>
+      <p class="exercise-desc">Set <code>TICKER</code> to your company's symbol, then build the filename from it with an f-string. Load it into <code>df_raw</code> and run <code>.info()</code> to see what you are dealing with. Doing it this way means every cell below works no matter which company you took — you only change this one line.</p>
+      <div class="cell" id="cell-s2b-1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="import pandas as pd
+
+TICKER = 'MCD'   # ← change this to YOUR company: MCD, SBUX, CMG, DPZ or WEN
+
+# YOUR CODE HERE">import pandas as pd
+
+TICKER = 'MCD'   # ← change this to YOUR company: MCD, SBUX, CMG, DPZ or WEN
+
+# YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>import pandas as pd
+
+TICKER = 'MCD'                                   # your company symbol — every later cell reads this
+df_raw = pd.read_csv(f'data/{TICKER}_2025_raw.csv')
+# f-string builds the path from TICKER, so 'MCD' → 'data/MCD_2025_raw.csv'
+# keeping the raw load in its own variable means you can always start over without re-reading the file
+
+df_raw.info()                                    # column names, non-null counts, dtypes — the fastest way to spot holes
+print(f'\nRows: {len(df_raw)}')                  # len() on a DataFrame counts rows, not columns
+df_raw.head()                                    # eyeball the first few rows — are the dates even in order?</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Cleaning ── -->
+  <div class="lesson" id="s2b-clean">
+    <h2>🧹 Clean Your File</h2>
+    <div class="concept-box">
+      <p>Your firm's cleaning rules for this sector, and the reasoning behind each one:</p>
+      <p><strong>Forward fill missing Open/Close.</strong> A price that did not print is best approximated by the last price that did. <code>ffill()</code> never looks into the future, which matters — filling a price with tomorrow's value would leak information a real trader could not have had.</p>
+      <p><strong>Interpolate missing High/Low.</strong> Highs and lows drift smoothly with the price, so a straight line between the day before and the day after is a fair guess. <code>interpolate()</code> needs a value on <em>both</em> sides of the gap.</p>
+      <p><strong>Fill missing Volume with the median.</strong> Volume is wildly skewed — a few enormous days drag the <code>mean</code> upward, so the <code>median</code> is the more honest "typical day".</p>
+      <p>You also need to handle <strong>sorting</strong>, <strong>duplicates</strong>, and the two junk columns (<code>Dividends</code>, <code>Stock Splits</code>) — same as Session 2a.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Step 2</span>
+        <h3>Apply the cleaning rules</h3>
+      </div>
+      <p class="exercise-desc">Build <code>df</code> from <code>df_raw</code>. Parse the dates, drop the junk columns, remove duplicates, set the date as index and sort it, then fill the gaps by the rules above. Finish by checking <code>df.isnull().sum().sum()</code> — <strong>read the note underneath before you assume zero is the only right answer.</strong></p>
+      <div class="cell" id="cell-s2b-2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>df = df_raw.copy()                               # .copy() — without the () you get the method, not a copy;
+                                                 # without .copy() at all, df and df_raw stay the SAME object
+df['Date'] = pd.to_datetime(df['Date'])          # text → real datetimes, so the index can slice by month later
+df = df.drop(columns=['Dividends', 'Stock Splits'])
+# columns= is required — df.drop(['Dividends']) looks for ROWS with those labels and raises KeyError
+df = df.drop_duplicates()                        # removes rows that are byte-for-byte repeats of an earlier row
+df = df.set_index('Date').sort_index()           # Date becomes the index, then oldest → newest
+
+df[['Open', 'Close']] = df[['Open', 'Close']].ffill()
+# double brackets select BOTH columns at once; ffill carries the last known price forward into each gap
+df[['High', 'Low']] = df[['High', 'Low']].interpolate()
+# straight-line estimate between the value before the gap and the value after it
+df['Volume'] = df['Volume'].fillna(df['Volume'].median())
+# median, not mean — a few huge volume days would drag a mean well above a normal day
+
+print(f'Rows: {len(df_raw)} → {len(df)}')        # how many rows the cleaning actually removed
+print(f'Missing values left: {df.isnull().sum().sum()}')
+# .isnull() → True/False per cell; first .sum() → per-column counts; second .sum() → one grand total
+df.head()</pre></div>
+      </details>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">⚠️</span>
+      <div><strong>Two things will not come out clean, and both are deliberate.</strong> Depending on your ticker you may still see a missing value, or a row count that did not fall as far as you expected. Do not paper over them — read the next two boxes.</div>
+    </div>
+
+    <div class="concept-box">
+      <p><strong>The High that will not fill.</strong> If you drew MCD, <code>interpolate()</code> leaves one <code>High</code> still missing — it sits on the very first row, and interpolation needs a value on <em>both</em> sides of a gap. There is no "correct" fix, only trade-offs, and this is exactly the kind of call you will be asked to defend:</p>
+      <p>Fetch the true value from another source (best, if you can) &nbsp;·&nbsp; drop the row (cleanest, costs you a day) &nbsp;·&nbsp; floor it at <code>max(Open, Close)</code> (a High can never be below either, so this is the safest lower bound) &nbsp;·&nbsp; backfill from the next day (accepts look-ahead bias) &nbsp;·&nbsp; leave it as <code>NaN</code> and let downstream code skip it.</p>
+      <p>Whichever you pick, <strong>say which one you picked</strong> when you present. An unexplained number is worth less than an imperfect number with its reasoning attached.</p>
+    </div>
+
+    <div class="concept-box">
+      <p><strong>The duplicate that survives.</strong> <code>drop_duplicates()</code> only removes rows that are identical across <em>every</em> column. If a repeated row later had a price go missing in one copy but not the other, the two are no longer identical and both stay. Same trap as Session 2a — catch it by checking the <em>index</em> instead:</p>
+      <p><code>df.index.duplicated().sum()</code> counts dates appearing more than once, and <code>df = df[~df.index.duplicated(keep='first')]</code> keeps only the first row of each date.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Variation</span>
+        <h3>Handle your leftovers</h3>
+      </div>
+      <p class="exercise-desc">Check for both problems, then deal with whichever ones your ticker has. Print the before/after so your decision is visible.</p>
+      <div class="cell" id="cell-s2b-3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>print('Duplicate dates:', df.index.duplicated().sum())
+# checks the INDEX for repeats — catches same-date rows that drop_duplicates() missed
+df = df[~df.index.duplicated(keep='first')]      # ~ inverts the mask, so we keep the rows that are NOT repeats
+                                                 # keep='first' → the earliest copy of each date wins
+
+print('Still missing:\n', df.isnull().sum())     # per-column counts, so you can see WHICH column has the hole
+
+df['High'] = df['High'].fillna(df[['Open', 'Close']].max(axis=1))
+# the floor-it option: a day's High can never be below its own Open or Close
+# axis=1 → take the max ACROSS the two columns for each row (axis=0 would go down each column instead)
+
+print('\nAfter:', df.isnull().sum().sum(), 'missing,', len(df), 'rows')</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── The five questions ── -->
+  <div class="lesson" id="s2b-analysis">
+    <h2>📊 The Five Figures</h2>
+    <div class="concept-box">
+      <p>Everything below runs on your cleaned <code>df</code>. Write each answer down as you go — your team needs them side by side at the end.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Q1</span>
+        <h3>Total volume traded over the year</h3>
+      </div>
+      <p class="exercise-desc">One number: every share that changed hands in 2025. Note that this is not comparable across companies on its own — a $13 stock will always trade more shares than a $438 one.</p>
+      <div class="cell" id="cell-s2b-q1">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-q1')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-q1')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-q1"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>print(f'{TICKER} total volume: {df["Volume"].sum():,.0f}')
+# .sum() needs the () — without them you print the method object itself
+# :,.0f → thousands separators, no decimals
+
+print(f'{TICKER} traded value:  ${(df["Volume"] * df["Close"]).sum():,.0f}')
+# multiplying two columns works row by row, so this is shares × price on each day, then totalled
+# traded VALUE is the comparable figure across companies — raw share count is not</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Q2</span>
+        <h3>Highest and lowest close — and when</h3>
+      </div>
+      <p class="exercise-desc">You need the values <em>and</em> their dates. <code>.max()</code> gives the value; <code>.idxmax()</code> gives the index label where that value sits — here, the date. Remember from Session 1 that <code>.index.max()</code> is a different thing entirely (the latest date, not the best price).</p>
+      <div class="cell" id="cell-s2b-q2">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-q2')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-q2')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-q2"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>hi_date = df['Close'].idxmax()                   # idxmax = "index of the max" → the DATE of the best close
+lo_date = df['Close'].idxmin()                   # idxmin = same idea for the worst close
+
+print(f"Highest close: ${df['Close'].max():.2f} on {hi_date.date()}")
+# .date() strips the 00:00:00 time part off the timestamp so it prints as just the day
+print(f"Lowest close:  ${df['Close'].min():.2f} on {lo_date.date()}")
+
+print(f"\nRange: ${df['Close'].max() - df['Close'].min():.2f} "
+      f"({(df['Close'].max() / df['Close'].min() - 1) * 100:.1f}% peak-to-trough)")
+# how far the stock travelled across the year — a rough read on how volatile it was</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Q3</span>
+        <h3>Average close: January vs December</h3>
+      </div>
+      <p class="exercise-desc">A crude but useful read on which way the year went. With a datetime index you can slice a whole month by string: <code>df.loc["2025-01"]</code>.</p>
+      <div class="cell" id="cell-s2b-q3">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-q3')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-q3')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-q3"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>jan = df.loc['2025-01', 'Close'].mean()          # .loc[rows, column] — slice January, take Close, average it
+dec = df.loc['2025-12', 'Close'].mean()          # same for December
+
+print(f'January average:  ${jan:.2f}')
+print(f'December average: ${dec:.2f}')
+print(f'Change: {(dec / jan - 1) * 100:+.1f}%')
+# (end / start - 1) × 100 is the percentage change
+# :+.1f → the + forces the sign to show, so a gain reads as +12.3% rather than 12.3%</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Q4</span>
+        <h3>Do Mondays trade more heavily?</h3>
+      </div>
+      <p class="exercise-desc">A datetime index knows what day of the week each row falls on: <code>df.index.day_name()</code> returns "Monday", "Tuesday" and so on. Build a mask from it, then compare the Monday average volume against the average across all days.</p>
+      <div class="cell" id="cell-s2b-q4">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-q4')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-q4')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-q4"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>mask = df.index.day_name() == 'Monday'           # True on every Monday row, False everywhere else
+mondays = df[mask]                               # keep only the Monday rows
+
+mon_avg = mondays['Volume'].mean()
+all_avg = df['Volume'].mean()
+
+print(f'Monday average:  {mon_avg:,.0f}   ({len(mondays)} Mondays)')
+print(f'All-day average: {all_avg:,.0f}')
+print(f'Difference: {(mon_avg / all_avg - 1) * 100:+.1f}%')
+
+# Every weekday at once — a fairer test, since it shows whether Monday really stands out
+print()
+print(df.groupby(df.index.day_name())['Volume'].mean().round(0))
+# groupby splits the rows by weekday name, then averages Volume within each group</pre></div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge original">Q5</span>
+        <h3>Did the year finish nearer the high or the low?</h3>
+      </div>
+      <p class="exercise-desc">Take the final close and measure its distance to the year's best and worst close. A stock closing the year near its high has momentum behind it; one closing near its low does not.</p>
+      <div class="cell" id="cell-s2b-q5">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-q5')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-q5')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-q5"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>last  = df['Close'].iloc[-1]                     # iloc[-1] → last row by position = the year's final close
+high  = df['Close'].max()
+low   = df['Close'].min()
+
+print(f'Final close: ${last:.2f}')
+print(f'Below the high by: ${high - last:.2f}')
+print(f'Above the low by:  ${last - low:.2f}')
+
+position = (last - low) / (high - low) * 100
+# where the final close sits in the year's range: 0% = at the low, 100% = at the high
+print(f'\nFinished at {position:.0f}% of the yearly range '
+      f"({'nearer the HIGH' if position > 50 else 'nearer the LOW'})")</pre></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ── Debrief ── -->
+  <div class="lesson" id="s2b-debrief">
+    <h2>🤝 Come Back Together</h2>
+    <div class="concept-box">
+      <p>Put your five figures next to everyone else's. <strong>As a group, which single stock would you recommend your firm buy for the coming year, and why?</strong></p>
+      <p>Some things worth arguing about: total share volume is not comparable across companies at different price levels — traded <em>value</em> is. A big peak-to-trough range means opportunity and risk in equal measure, and which one it means to you depends on your holding period. One year of price data tells you nothing about whether a company actually makes money. And a weekday volume pattern found in a single year of one stock is the kind of thing that disappears the moment you test it on another year.</p>
+      <p>Be honest about what your cleaning decisions did to your numbers, too — whoever drew MCD filled a price that was never really there.</p>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-header">
+        <span class="exercise-badge variation">Optional</span>
+        <h3>Compare all five at once</h3>
+      </div>
+      <p class="exercise-desc">If you want the whole picture in one table, loop over every ticker, run the same cleaning, and collect the figures into a single DataFrame. This is what you would actually do in practice rather than five people running five notebooks.</p>
+      <div class="cell" id="cell-s2b-all">
+        <div class="cell-toolbar">
+          <span class="cell-num">In [ ]</span>
+          <div class="spacer"></div>
+          <button class="reset-btn" onclick="resetCell('cell-s2b-all')">↺ Reset</button>
+          <button class="run-btn" onclick="runCell('cell-s2b-all')">▶ Run</button>
+        </div>
+        <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
+        <div class="cell-output" id="output-cell-s2b-all"></div>
+      </div>
+      <details class="solution">
+        <summary>Show Solution</summary>
+        <div class="solution-body"><pre>rows = []                                        # collect one dict per company, build the table at the end
+
+for tk in ['MCD', 'SBUX', 'CMG', 'DPZ', 'WEN']:
+    d = pd.read_csv(f'data/{tk}_2025_raw.csv')   # same cleaning recipe as Step 2, applied to each file
+    d['Date'] = pd.to_datetime(d['Date'])
+    d = d.drop(columns=['Dividends', 'Stock Splits']).drop_duplicates()
+    d = d.set_index('Date').sort_index()
+    d = d[~d.index.duplicated(keep='first')]     # catch the same-date repeats drop_duplicates() misses
+    d[['Open', 'Close']] = d[['Open', 'Close']].ffill()
+    d[['High', 'Low']]   = d[['High', 'Low']].interpolate()
+    d['High'] = d['High'].fillna(d[['Open', 'Close']].max(axis=1))   # covers MCD's unfillable first row
+    d['Volume'] = d['Volume'].fillna(d['Volume'].median())
+
+    last, high, low = d['Close'].iloc[-1], d['Close'].max(), d['Close'].min()
+    mon = d[d.index.day_name() == 'Monday']['Volume'].mean()
+
+    rows.append({                                # one row of the summary table
+        'Ticker': tk,
+        'Return %': round((last / d['Close'].iloc[0] - 1) * 100, 1),
+        'Traded $bn': round((d['Volume'] * d['Close']).sum() / 1e9, 1),
+        'Range %': round((high / low - 1) * 100, 1),
+        'Mon vs avg %': round((mon / d['Volume'].mean() - 1) * 100, 1),
+        'Yr-end pos %': round((last - low) / (high - low) * 100),
+    })
+
+summary = pd.DataFrame(rows).set_index('Ticker')  # list of dicts → DataFrame, ticker as the index
+summary.sort_values('Return %', ascending=False)  # best performer first</pre></div>
+      </details>
+    </div>
+  </div>
+
+</div><!-- /sec-s2b -->
+
 </main>
 
 <!-- ── AI PANEL ── -->
@@ -1892,12 +2318,65 @@ _df26.loc[_missing_low,   'Low'] = np.nan
 
 _csv26 = _df26.to_csv(index=False)
 
+# ── Food service sector 2025 (raw, messy) ────────────
+# spec: (start price, daily vol, base volume, Monday volume effect)
+_fs_specs = {
+    'MCD':  (292.0, 0.0102,  3_200_000,  0.26),   # Mondays clearly heavier
+    'SBUX': ( 94.0, 0.0158,  9_400_000, -0.04),   # no real Monday effect
+    'CMG':  ( 57.0, 0.0171, 13_800_000,  0.14),   # mild Monday effect
+    'DPZ':  (438.0, 0.0139,    690_000,  0.31),   # Mondays clearly heavier
+    'WEN':  ( 13.2, 0.0183,  5_600_000, -0.09),   # Mondays actually lighter
+}
+_fs_dates = pd.date_range('2025-01-02', '2025-12-31', freq='B')
+_fs_n = len(_fs_dates)
+_fs_is_mon = (_fs_dates.dayofweek == 0).astype(float)
+
+_fs_store = {}
+for _i, (_tk, (_p0, _sig, _vbase, _moneff)) in enumerate(_fs_specs.items()):
+    np.random.seed(700 + _i)
+    _r  = np.random.normal(0.00038, _sig, _fs_n)
+    _c  = _p0 * np.cumprod(1 + _r)
+    _o  = _c * (1 + np.random.normal(0, 0.0033, _fs_n))
+    _h  = np.maximum(_o, _c) * (1 + np.abs(np.random.normal(0, 0.0062, _fs_n)))
+    _l  = np.minimum(_o, _c) * (1 - np.abs(np.random.normal(0, 0.0062, _fs_n)))
+    _v  = _vbase + np.random.exponential(_vbase * 0.55, _fs_n)
+    _v  = _v * (1 + _moneff * _fs_is_mon)          # apply the Monday effect
+
+    _d = pd.DataFrame({
+        'Date': _fs_dates.strftime('%Y-%m-%d'),
+        'Open': np.round(_o, 2), 'High': np.round(_h, 2),
+        'Low': np.round(_l, 2),  'Close': np.round(_c, 2),
+        'Volume': np.round(_v, 0),
+        'Dividends': 0.0, 'Stock Splits': 0.0,
+    })
+
+    # 1. knock a handful of rows out of chronological order
+    _sw = np.random.choice(_fs_n, 10, replace=False)
+    _d.iloc[_sw] = _d.iloc[_sw[::-1]].values
+
+    # 2. duplicate 2-4 rows outright
+    _ndup = np.random.randint(2, 5)
+    _d = pd.concat([_d, _d.iloc[np.random.choice(_fs_n, _ndup, replace=False)]]).reset_index(drop=True)
+
+    # 3. punch holes in every price/volume column
+    _L = len(_d)
+    for _col, _k in [('Open', 3), ('Close', 4), ('High', 2), ('Low', 2), ('Volume', 3)]:
+        _d.loc[np.random.choice(_L, _k, replace=False), _col] = np.nan
+
+    # 4. MCD gets an unfillable High on row 0 — interpolate() needs a value on BOTH
+    #    sides of a gap, so this one survives cleaning and forces a judgement call
+    if _tk == 'MCD':
+        _d.loc[0, 'High'] = np.nan
+
+    _fs_store[f'data/{_tk}_2025_raw.csv'] = _d.to_csv(index=False)
+
 # ── Patch pd.read_csv ────────────────────────────────
 _orig_read_csv = pd.read_csv
 _csv_store = {
     'data/AAPL_2025.csv': _csv25,
     'data/AAPL_2026_raw.csv': _csv26,
 }
+_csv_store.update(_fs_store)
 def _read_csv(path, **kw):
     if isinstance(path, str) and path in _csv_store:
         return _orig_read_csv(StringIO(_csv_store[path]), **kw)
