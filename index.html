@@ -238,6 +238,12 @@ header .spacer { flex: 1; }
 }
 
 
+.api-remember {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text3); margin: 2px 0 8px; cursor: pointer;
+}
+.api-remember input { cursor: pointer; }
+
 /* ── live watch ── */
 .watch-btn {
   font-family: inherit; font-size: 11px; font-weight: 600; letter-spacing: .02em;
@@ -4543,6 +4549,7 @@ print(draft)</pre></div>
       </select>
       <input class="api-input" type="password" id="api-key-input" placeholder="sk-... or sk-ant-...">
     </div>
+    <label class="api-remember"><input type="checkbox" id="api-remember"> Remember for this tab</label>
     <button class="api-save" onclick="saveApiKey()">Connect →</button>
     <div class="api-saved" id="api-saved-row" style="display:none">
       <div class="api-saved-dot"></div>
@@ -5432,6 +5439,17 @@ async function runAllInSection(sectionId, btn) {
 
 // Run All buttons are now static in the HTML; no injection needed.
 
+// Restore a key remembered for this tab
+try {
+  const k = sessionStorage.getItem('pff_key');
+  if (k) {
+    document.getElementById('api-key-input').value = k;
+    document.getElementById('api-provider').value = sessionStorage.getItem('pff_prov') || 'anthropic';
+    document.getElementById('api-remember').checked = true;
+    saveApiKey();
+  }
+} catch(e) {}
+
 // Disable run buttons until ready
 document.querySelectorAll('.run-btn').forEach(b => b.disabled = true);
 document.querySelectorAll('.run-all-btn').forEach(b => b.disabled = true);
@@ -5482,6 +5500,11 @@ function saveApiKey() {
   apiKey = key;
   apiProvider = prov;
 
+  // sessionStorage: survives a reload, cleared when the tab closes, never leaves the browser
+  if (document.getElementById('api-remember')?.checked) {
+    try { sessionStorage.setItem('pff_key', key); sessionStorage.setItem('pff_prov', prov); } catch(e) {}
+  }
+
   document.getElementById('api-saved-label').textContent =
     (prov === 'openai' ? 'ChatGPT' : 'Claude') + ' connected';
   document.getElementById('api-key-input').value = '';
@@ -5493,6 +5516,7 @@ function saveApiKey() {
 
 function changeApiKey() {
   apiKey = '';
+  try { sessionStorage.removeItem('pff_key'); sessionStorage.removeItem('pff_prov'); } catch(e) {}
   document.getElementById('api-saved-row').style.display = 'none';
   document.querySelector('#api-setup-area .api-row').style.display = 'flex';
   document.querySelector('#api-setup-area .api-save').style.display = 'block';
