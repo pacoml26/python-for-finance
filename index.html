@@ -603,7 +603,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 14:26 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 20:38 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -4638,6 +4638,22 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 
+# ── Matplotlib: dark theme so text is visible on the dark output panel ──
+# Without this, titles and axis labels render in matplotlib's default BLACK
+# on the dark background we save onto, and vanish.
+plt.rcParams.update({
+    'figure.facecolor': '#0D1117', 'axes.facecolor':  '#0D1117',
+    'savefig.facecolor': '#0D1117',
+    'text.color': '#E6EDF3', 'axes.labelcolor': '#E6EDF3', 'axes.titlecolor': '#E6EDF3',
+    'xtick.color': '#8B949E', 'ytick.color': '#8B949E',
+    'axes.edgecolor': '#30363D', 'grid.color': '#21262D',
+    'legend.facecolor': '#161B22', 'legend.edgecolor': '#30363D',
+    'axes.prop_cycle': plt.cycler(color=[
+        '#58A6FF', '#3FB950', '#F0A84A', '#FF7B72', '#BC8CFF',
+        '#79C0FF', '#56D364', '#E3B341', '#FFA198', '#D2A8FF']),
+    'figure.autolayout': True,
+})
+
 # ── Matplotlib capture ──────────────────────────────
 def _capture_show(*args, **kwargs):
     buf = io.BytesIO()
@@ -4648,6 +4664,12 @@ def _capture_show(*args, **kwargs):
     plt.clf()
     print(f'__IMG__{b64}__IMG__')
 plt.show = _capture_show
+
+def _autoshow():
+    # If a cell drew something but never called plt.show(), show it anyway —
+    # in a notebook the figure appears on its own, so match that.
+    if plt.get_fignums() and plt.gcf().get_axes():
+        _capture_show()
 
 # ── display() like Jupyter ───────────────────────────
 import builtins
@@ -5101,6 +5123,10 @@ try:
     if _plt_check.get_fignums():
         _plt_check.show()
         _plt_check.close('all')
+    try:
+        _autoshow()          # a figure drawn without plt.show() still appears
+    except Exception:
+        pass
 except Exception:
     print(_tb.format_exc())
 finally:
