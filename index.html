@@ -603,7 +603,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 23:19 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 23:34 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -2735,6 +2735,7 @@ plt.tight_layout()                                  # stops the axis labels bein
       <p>A moving average smooths a noisy price into a trend. <code>df["Close"].rolling(20).mean()</code> slides a 20-row window down the column and averages whatever sits inside it, so each point is the mean of that day and the 19 before it.</p>
       <p>The window length is the whole trade-off. A <strong>fast</strong> average (20 days) hugs the price and turns quickly, but whipsaws on noise. A <strong>slow</strong> one (120 days) ignores noise and shows the underlying trend, but turns long after the move began. Neither is right — they answer different questions, and Session 8 builds a trading strategy out of exactly that tension.</p>
       <p>The first rows come back as <code>NaN</code>, and that is correct: a 120-day average genuinely does not exist until day 120. Matplotlib simply leaves that stretch of the line blank.</p>
+      <p><strong>Where the averages cross</strong> — the point at which the fast line rises through the slow one — is the classic buy signal, and your course turns it into a trading strategy in <strong>week 8</strong> using <code>np.where</code> and <code>.diff()</code>. It is covered in Session 8 here, so leave it for now: the tools for it have not been introduced yet.</p>
     </div>
 
     <div class="exercise-block">
@@ -2778,9 +2779,9 @@ plt.tight_layout()</pre></div>
     <div class="exercise-block">
       <div class="exercise-header">
         <span class="exercise-badge variation">Variation</span>
-        <h3>Where do the averages cross?</h3>
+        <h3>Volume against daily returns</h3>
       </div>
-      <p class="exercise-desc">A crossover — fast rising through slow — is the classic buy signal. Find the dates where it happens by comparing the two columns and looking for where that comparison flips.</p>
+      <p class="exercise-desc">Your assessment asks for a scatter plot exploring whether trading volume relates to daily returns. Build it here: <code>plt.scatter(x, y)</code> draws one dot per row. With ~250 points the dots overlap, so pass <code>alpha</code> to make them semi-transparent and reveal where the data is dense.</p>
       <div class="cell" id="cell-s4-3">
         <div class="cell-toolbar">
           <span class="cell-num">In [ ]</span>
@@ -2795,27 +2796,28 @@ plt.tight_layout()</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>above = df['FastMA'] &gt; df['SlowMA']                 # True on days the fast average leads
-cross = above != above.shift()                      # True only where today differs from yesterday
-cross = cross &amp; df['SlowMA'].notna()                # ignore the warm-up period where SlowMA is NaN
+        <div class="solution-body"><pre>df["Return"] = df["Close"].pct_change()
 
-print('Crossover dates:')
-for d in df.index[cross]:
-    direction = 'golden cross (bullish)' if above[d] else 'death cross (bearish)'
-    print(f'  {d.date()}  {direction}')
+plt.figure(figsize=(8, 5))
+plt.title("NVDA — volume against daily return")
+plt.xlabel("Daily return")
+plt.ylabel("Volume (shares)")
+plt.scatter(df["Return"], df["Volume"], alpha=0.4)
+# alpha=0.4 makes each dot semi-transparent, so overlapping points show up darker
+plt.tight_layout()
+plt.show()
 
-plt.figure(figsize=(10, 4))
-plt.title('NVDA — crossovers marked')
-plt.plot(df['Close'], alpha=0.35, label='Close')
-plt.plot(df['FastMA'], label='20-day')
-plt.plot(df['SlowMA'], label='120-day')
-plt.scatter(df.index[cross], df.loc[cross, 'Close'], color='red', zorder=5, label='Crossover')
-# scatter draws individual points; zorder=5 keeps them on top of the lines
-plt.legend(); plt.tight_layout()</pre></div>
+# Answer the question, do not just draw it:
+print("Correlation, signed return vs volume:", df["Return"].corr(df["Volume"]).round(3))
+print("Correlation, SIZE of move vs volume: ", df["Return"].abs().corr(df["Volume"]).round(3))
+# Two different questions. The signed return asks "do up-days trade more than down-days".
+# The absolute return asks "do BIG days trade more than quiet ones", which is usually the
+# more interesting one — but check what your own numbers say rather than assuming.
+# A correlation near 0 is a real finding: report it as no relationship, do not hunt for one.</pre></div>
       </details>
     </div>
 
-    <div class="exercise-block">
+<div class="exercise-block">
       <div class="exercise-header">
         <span class="exercise-badge variation">Variation</span>
         <h3>Daily returns as a histogram</h3>
