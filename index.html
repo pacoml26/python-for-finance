@@ -603,7 +603,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 23:34 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 23:38 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -2485,7 +2485,7 @@ print(f'\nLargest gap between the two: {diff:.5f}')
 
     <div class="exercise-block">
       <div class="exercise-header">
-        <span class="exercise-badge original">Original</span>
+        <span class="exercise-badge original">Original · Cumulatively Comparing (1)</span>
         <h3>Cumulative log returns</h3>
       </div>
       <p class="exercise-desc">Add a <code>CumulativeReturn</code> column holding the running sum of your log returns. Because log returns are additive, <code>.cumsum()</code> is all you need.</p>
@@ -2513,7 +2513,7 @@ print(df[['Close', 'LogReturn', 'CumulativeReturn']].tail())</pre></div>
 
     <div class="exercise-block">
       <div class="exercise-header">
-        <span class="exercise-badge original">Original</span>
+        <span class="exercise-badge original">Original · Cumulatively Comparing (2)</span>
         <h3>Prove the two agree</h3>
       </div>
       <p class="exercise-desc">Compute the whole-period return two ways: sum the log returns and convert with <code>np.exp(x) - 1</code>, then compound the simple returns with <code>(1 + r).prod() - 1</code>. They should match to many decimal places. If they do not, something is wrong with your data.</p>
@@ -3266,7 +3266,7 @@ print(corr.loc[['AAPL','MSFT','GOOGL','NVDA','META'],
 
     <div class="exercise-block">
       <div class="exercise-header">
-        <span class="exercise-badge original">Original</span>
+        <span class="exercise-badge variation">Variation</span>
         <h3>Heatmap of the correlation matrix</h3>
       </div>
       <p class="exercise-desc">Draw a heatmap of the correlations for eight or so stocks. Annotate the cells and pin the colour scale from −1 to 1.</p>
@@ -3454,7 +3454,7 @@ print((cum.iloc[-1] * 100).round(1).sort_values(ascending=False).to_string())</p
 
     <div class="exercise-block">
       <div class="exercise-header">
-        <span class="exercise-badge original">Setup</span>
+        <span class="exercise-badge original">Original · Apple Returns</span>
         <h3>Load two stocks and compute their returns</h3>
       </div>
       <p class="exercise-desc">Load <code>data/trading_data.csv</code> — Apple and Google closes side by side. Add a returns column for each. See if you can do Apple in one line.</p>
