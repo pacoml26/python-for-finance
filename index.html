@@ -603,7 +603,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 20:38 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 20:43 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -4651,8 +4651,10 @@ plt.rcParams.update({
     'axes.prop_cycle': plt.cycler(color=[
         '#58A6FF', '#3FB950', '#F0A84A', '#FF7B72', '#BC8CFF',
         '#79C0FF', '#56D364', '#E3B341', '#FFA198', '#D2A8FF']),
-    'figure.autolayout': True,
 })
+# NOTE: deliberately NOT setting figure.autolayout — it silently overrides
+# fig.subplots_adjust(), and savefig already uses bbox_inches='tight' so
+# labels are never clipped anyway.
 
 # ── Matplotlib capture ──────────────────────────────
 def _capture_show(*args, **kwargs):
@@ -5034,14 +5036,33 @@ async function ensurePackagesFor(code) {
 
   const prev = document.getElementById('status-text').textContent;
   setStatus('Loading ' + needed.join(', ') + '… (first time only)');
-  try {
-    await pyodide.loadPackage(needed);
-    needed.forEach(p => PKG_LOADED.add(p));
-    setStatus(prev);
-  } catch (e) {
-    setStatus('❌ could not load ' + needed.join(', '));
-    throw e;
+
+  for (const pkg of needed) {
+    let ok = false;
+    // 1. the fast path — packages shipped with the Pyodide distribution
+    try {
+      await pyodide.loadPackage(pkg);
+      ok = true;
+    } catch (e) {
+      console.warn('loadPackage failed for ' + pkg + ', trying micropip', e);
+    }
+    // 2. fall back to micropip, which can fetch a pure-Python wheel from PyPI
+    if (!ok) {
+      try {
+        setStatus('Fetching ' + pkg + ' from PyPI…');
+        await pyodide.loadPackage('micropip');
+        const micropip = pyodide.pyimport('micropip');
+        await micropip.install(pkg);
+        ok = true;
+      } catch (e2) {
+        setStatus('❌ could not load ' + pkg);
+        throw new Error(pkg + ' is unavailable in this browser session. ' +
+          'Check your connection and try the cell again.');
+      }
+    }
+    if (ok) PKG_LOADED.add(pkg);
   }
+  setStatus(prev);
 }
 
 // ══════════════════════════════════════════════════════
