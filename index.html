@@ -603,7 +603,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 20:43 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 23:19 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -774,6 +774,7 @@ body.resizing #ai-panel { transition: none; }
           <button class="run-btn" onclick="runCell('cell-s1-1a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 
 df = pd.read_csv('data/AAPL_2025.csv')
@@ -806,6 +807,7 @@ df                               # last line outputs automatically — displays 
           <button class="run-btn" onclick="runCell('cell-s1-1b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# Load only the Date and Close columns
 df_small = pd.read_csv('data/AAPL_2025.csv', usecols=[...])
 df_small"># Load only the Date and Close columns
@@ -845,6 +847,7 @@ df_small                         # display the two-column table</pre></div>
           <button class="run-btn" onclick="runCell('cell-s1-2a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df.info()">df.info()</textarea>
         <div class="cell-output" id="output-cell-s1-2a"></div>
       </div>
@@ -856,6 +859,7 @@ df_small                         # display the two-column table</pre></div>
           <button class="run-btn" onclick="runCell('cell-s1-2b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df.shape">df.shape</textarea>
         <div class="cell-output" id="output-cell-s1-2b"></div>
       </div>
@@ -881,6 +885,7 @@ df.shape    # returns (rows, columns) as a tuple — tells you the size of the t
           <button class="run-btn" onclick="runCell('cell-s1-2c')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# Count days where volume > 100 million
 (df['Volume'] > ...).sum()"># Count days where volume > 100 million
 (df['Volume'] > ...).sum()</textarea>
@@ -918,6 +923,7 @@ df.shape    # returns (rows, columns) as a tuple — tells you the size of the t
           <button class="run-btn" onclick="runCell('cell-s1-3a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE
 display(df.head(...)[['Date', '...', '...']])"># YOUR CODE HERE
 display(df.head(...)[['Date', '...', '...']])</textarea>
@@ -946,6 +952,7 @@ display(df.head(...)[['Date', '...', '...']])</textarea>
           <button class="run-btn" onclick="runCell('cell-s1-3b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-3b"></div>
       </div>
@@ -981,6 +988,7 @@ display(df.head(...)[['Date', '...', '...']])</textarea>
           <button class="run-btn" onclick="runCell('cell-s1-4a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="mask = df['Date'] >= '...'
 df[mask]">mask = df['Date'] >= '...'
 df[mask]</textarea>
@@ -1007,6 +1015,7 @@ df[mask]                           # pass the mask into df[...] to keep only the
           <button class="run-btn" onclick="runCell('cell-s1-4b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-4b"></div>
       </div>
@@ -1032,6 +1041,7 @@ df[mask]  # returns only January rows</pre></div>
           <button class="run-btn" onclick="runCell('cell-s1-5a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-5a"></div>
       </div>
@@ -1056,6 +1066,7 @@ df[mask]                           # filter to only high-volume days</pre></div>
           <button class="run-btn" onclick="runCell('cell-s1-5b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-5b"></div>
       </div>
@@ -1094,6 +1105,7 @@ df[mask]  # days where Close > 240 and Volume > 80M simultaneously</pre></div>
           <button class="run-btn" onclick="runCell('cell-s1-6a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df['Date'] = pd.to_datetime(df['Date'])
 df = df.set_index('Date')
 df">df['Date'] = pd.to_datetime(df['Date'])
@@ -1123,6 +1135,7 @@ df                                        # display: the index is now dates inst
           <button class="run-btn" onclick="runCell('cell-s1-6b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# Get all of Q2 2025 (run the indexing cell above first!)
 df.loc[...:...]"># Get all of Q2 2025 (run the indexing cell above first!)
 df.loc[...:...]</textarea>
@@ -1159,6 +1172,7 @@ df.loc[...:...]</textarea>
           <button class="run-btn" onclick="runCell('cell-s1-7a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# Create a mask for days where Close > annual mean
 mask = df['Close'] > df['Close'].mean()
 
@@ -1213,6 +1227,7 @@ print('Q4', mask[quarters == '2025Q4'].sum())
           <button class="run-btn" onclick="runCell('cell-s1-7b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-7b"></div>
       </div>
@@ -1243,6 +1258,7 @@ print(f'\nBest month: {monthly_avg.idxmax()} (avg: ${monthly_avg.max():.2f})')
           <button class="run-btn" onclick="runCell('cell-s1-8a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-8a"></div>
       </div>
@@ -1274,6 +1290,7 @@ print(f"Total volume:  {march['Volume'].sum():,.0f}")
           <button class="run-btn" onclick="runCell('cell-s1-8b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s1-8b"></div>
       </div>
@@ -1328,6 +1345,7 @@ print(f'\n{winner} was more actively traded.')</pre></div>
           <button class="run-btn" onclick="runCell('cell-s2-1a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 
 df_raw = pd.read_csv('data/AAPL_2026_raw.csv')
@@ -1345,6 +1363,7 @@ df_raw</textarea>
           <button class="run-btn" onclick="runCell('cell-s2-1b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df_raw.info()">df_raw.info()</textarea>
         <div class="cell-output" id="output-cell-s2-1b"></div>
       </div>
@@ -1381,6 +1400,7 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
           <button class="run-btn" onclick="runCell('cell-s2-2a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df_raw.isnull().sum().sum()">df_raw.isnull().sum().sum()</textarea>
         <div class="cell-output" id="output-cell-s2-2a"></div>
       </div>
@@ -1407,6 +1427,7 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
           <button class="run-btn" onclick="runCell('cell-s2-2b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2-2b"></div>
       </div>
@@ -1450,6 +1471,7 @@ df_raw.info()  # check column types and non-null counts — a column with fewer 
           <button class="run-btn" onclick="runCell('cell-s2-3a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df = df_raw.copy()
 df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
 df = df.set_index('Date')
@@ -1509,6 +1531,7 @@ df                                                       # display the cleaned t
           <button class="run-btn" onclick="runCell('cell-s2-3c')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2-3c"></div>
       </div>
@@ -1554,6 +1577,7 @@ except TypeError as e:
           <button class="run-btn" onclick="runCell('cell-s2-3b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2-3b"></div>
       </div>
@@ -1590,6 +1614,7 @@ print(f'Duplicates: {df.index.duplicated().sum()}')
           <button class="run-btn" onclick="runCell('cell-s2-4a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df.info()">df.info()</textarea>
         <div class="cell-output" id="output-cell-s2-4a"></div>
       </div>
@@ -1613,6 +1638,7 @@ print(f'Duplicates: {df.index.duplicated().sum()}')
           <button class="run-btn" onclick="runCell('cell-s2-4b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df.dtypes">df.dtypes</textarea>
         <div class="cell-output" id="output-cell-s2-4b"></div>
       </div>
@@ -1645,6 +1671,7 @@ print(f'Duplicates: {df.index.duplicated().sum()}')
           <button class="run-btn" onclick="runCell('cell-s2-5a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# Close: ffill then bfill (handles NaN at the very first row too)
 df['Close'] = df['Close'].ffill().bfill()
 
@@ -1717,6 +1744,7 @@ df.isnull().sum()  # verify: every column should now show 0 missing values</pre>
           <button class="run-btn" onclick="runCell('cell-s2-5b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# Build a clean working copy from df_raw (same steps as before)
 df_compare = df_raw.copy()
 df_compare['Date'] = pd.to_datetime(df_compare['Date'], dayfirst=True)
@@ -1793,6 +1821,7 @@ df_compare.loc[missing_dates, ['Close', 'Close_ffill', 'Close_bfill']]</pre></di
           <button class="run-btn" onclick="runCell('cell-s2-6a')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="df['Volume'] = df['Volume'].astype('int64')
 print(df['Volume'].dtype)
 df.head()">df['Volume'] = df['Volume'].astype('int64')
@@ -1822,6 +1851,7 @@ df.head()                                    # head() shows the first 5 rows —
           <button class="run-btn" onclick="runCell('cell-s2-6b')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# describe() gives summary stats for every numeric column at once
 # count = number of non-NaN values (should now equal len(df) — no missing data!)
 # mean = average, std = standard deviation (spread)
@@ -1878,6 +1908,7 @@ df.describe()</textarea>
           <button class="run-btn" onclick="runCell('cell-s2-bh1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# df is your cleaned 2026 DataFrame with a DatetimeIndex
 # Tip: you can filter by date string, e.g. df.loc['2026-01']
 
@@ -1976,6 +2007,7 @@ print(f'Sell end-of-April:       ${sell_april:.2f}  →  Return: {return_april:.
           <button class="run-btn" onclick="runCell('cell-s2b-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 
 TICKER = 'MCD'   # ← change this to YOUR company: MCD, SBUX, CMG, DPZ or WEN
@@ -2028,6 +2060,7 @@ df_raw.head()                                    # eyeball the first few rows �
           <button class="run-btn" onclick="runCell('cell-s2b-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-2"></div>
       </div>
@@ -2085,6 +2118,7 @@ df.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s2b-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-3"></div>
       </div>
@@ -2127,6 +2161,7 @@ print('\nAfter:', df.isnull().sum().sum(), 'missing,', len(df), 'rows')</pre></d
           <button class="run-btn" onclick="runCell('cell-s2b-q1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-q1"></div>
       </div>
@@ -2156,6 +2191,7 @@ print(f'{TICKER} traded value:  ${(df["Volume"] * df["Close"]).sum():,.0f}')
           <button class="run-btn" onclick="runCell('cell-s2b-q2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-q2"></div>
       </div>
@@ -2188,6 +2224,7 @@ print(f"\nRange: ${df['Close'].max() - df['Close'].min():.2f} "
           <button class="run-btn" onclick="runCell('cell-s2b-q3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-q3"></div>
       </div>
@@ -2218,6 +2255,7 @@ print(f'Change: {(dec / jan - 1) * 100:+.1f}%')
           <button class="run-btn" onclick="runCell('cell-s2b-q4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-q4"></div>
       </div>
@@ -2254,6 +2292,7 @@ print(df.groupby(df.index.day_name())['Volume'].mean().round(0))
           <button class="run-btn" onclick="runCell('cell-s2b-q5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-q5"></div>
       </div>
@@ -2298,6 +2337,7 @@ print(f'\nFinished at {position:.0f}% of the yearly range '
           <button class="run-btn" onclick="runCell('cell-s2b-all')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s2b-all"></div>
       </div>
@@ -2371,6 +2411,7 @@ summary.sort_values('Return %', ascending=False)  # best performer first</pre></
           <button class="run-btn" onclick="runCell('cell-s3-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 import numpy as np
 
@@ -2414,6 +2455,7 @@ df[['Close', 'DailyReturn']].head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s3-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s3-2"></div>
       </div>
@@ -2455,6 +2497,7 @@ print(f'\nLargest gap between the two: {diff:.5f}')
           <button class="run-btn" onclick="runCell('cell-s3-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s3-3"></div>
       </div>
@@ -2482,6 +2525,7 @@ print(df[['Close', 'LogReturn', 'CumulativeReturn']].tail())</pre></div>
           <button class="run-btn" onclick="runCell('cell-s3-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s3-4"></div>
       </div>
@@ -2530,6 +2574,7 @@ print(f'Difference: {abs(converted_log_return - period_simple_return):.12f}')
           <button class="run-btn" onclick="runCell('cell-s3-5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s3-5"></div>
       </div>
@@ -2563,6 +2608,7 @@ print(f'Exact simple return to 31 Mar: {np.exp(df["CumulativeReturn"].loc["2026-
           <button class="run-btn" onclick="runCell('cell-s3-6')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s3-6"></div>
       </div>
@@ -2594,6 +2640,7 @@ print(f'Same figure via log returns:         {np.exp(span) - 1:.2%}')
           <button class="run-btn" onclick="runCell('cell-s3-7')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s3-7"></div>
       </div>
@@ -2652,6 +2699,7 @@ print(f'\nUp days: {up} of {total}  ({up/total:.1%})')</pre></div>
           <button class="run-btn" onclick="runCell('cell-s4-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -2703,6 +2751,7 @@ plt.tight_layout()                                  # stops the axis labels bein
           <button class="run-btn" onclick="runCell('cell-s4-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s4-2"></div>
       </div>
@@ -2740,6 +2789,7 @@ plt.tight_layout()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s4-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s4-3"></div>
       </div>
@@ -2779,6 +2829,7 @@ plt.legend(); plt.tight_layout()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s4-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s4-4"></div>
       </div>
@@ -2841,6 +2892,7 @@ print(f'Annualised vol:    {returns.std() * (252 ** 0.5):.1%}')
           <button class="run-btn" onclick="runCell('cell-s5-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 
 # YOUR CODE HERE">import pandas as pd
@@ -2887,6 +2939,7 @@ df.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s5-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-2"></div>
       </div>
@@ -2912,6 +2965,7 @@ df.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s5-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-3"></div>
       </div>
@@ -2936,6 +2990,7 @@ df.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s5-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-4"></div>
       </div>
@@ -2962,6 +3017,7 @@ df.groupby('day')['cshtrd'].sum().nlargest(3)
           <button class="run-btn" onclick="runCell('cell-s5-5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-5"></div>
       </div>
@@ -2991,6 +3047,7 @@ df[df['prccd'] &gt; 1000].groupby(['conm', 'tic', 'month']).size().rename('close
           <button class="run-btn" onclick="runCell('cell-s5-6')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-6"></div>
       </div>
@@ -3041,6 +3098,7 @@ aggregated.sort_values('diff', ascending=False)</pre></div>
           <button class="run-btn" onclick="runCell('cell-s5-7')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-7"></div>
       </div>
@@ -3069,6 +3127,7 @@ volume.sum().nlargest(10).rename('Total trading volume')
           <button class="run-btn" onclick="runCell('cell-s5-8')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-8"></div>
       </div>
@@ -3103,6 +3162,7 @@ daily.fillna(0)
           <button class="run-btn" onclick="runCell('cell-s5-9')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s5-9"></div>
       </div>
@@ -3161,6 +3221,7 @@ print((monthly_ret.max() * 100).round(1).sort_values(ascending=False).head())</p
           <button class="run-btn" onclick="runCell('cell-s6-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -3215,6 +3276,7 @@ print(corr.loc[['AAPL','MSFT','GOOGL','NVDA','META'],
           <button class="run-btn" onclick="runCell('cell-s6-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s6-2"></div>
       </div>
@@ -3246,6 +3308,7 @@ plt.tight_layout()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s6-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s6-3"></div>
       </div>
@@ -3291,6 +3354,7 @@ print(pairs.sort_values().head(6).round(3))
           <button class="run-btn" onclick="runCell('cell-s6-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s6-4"></div>
       </div>
@@ -3335,6 +3399,7 @@ plt.show()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s6-5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s6-5"></div>
       </div>
@@ -3399,6 +3464,7 @@ print((cum.iloc[-1] * 100).round(1).sort_values(ascending=False).to_string())</p
           <button class="run-btn" onclick="runCell('cell-s7-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
@@ -3442,6 +3508,7 @@ trading_data.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s7-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s7-2"></div>
       </div>
@@ -3484,6 +3551,7 @@ print(model.summary())</pre></div>
           <button class="run-btn" onclick="runCell('cell-s7-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s7-3"></div>
       </div>
@@ -3524,6 +3592,7 @@ plt.show()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s7-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s7-4"></div>
       </div>
@@ -3590,6 +3659,7 @@ print(f'The relationship is statistically {verdict} at the 5% level.')</pre></di
           <button class="run-btn" onclick="runCell('cell-s8-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -3645,6 +3715,7 @@ print('Market:  ', f"{df['Market'].iloc[-1]:.1%}")</pre></div>
           <button class="run-btn" onclick="runCell('cell-s8-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s8-2"></div>
       </div>
@@ -3686,6 +3757,7 @@ df[abs(df['Signal'].diff()) == 2]
           <button class="run-btn" onclick="runCell('cell-s8-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s8-3"></div>
       </div>
@@ -3715,6 +3787,7 @@ df[['prccd', 'FastMA', 'SlowMA']].tail()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s8-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s8-4"></div>
       </div>
@@ -3767,6 +3840,7 @@ print(f"\nStrategy beat buy-and-hold on {result['Beat market?'].sum()} of {len(r
           <button class="run-btn" onclick="runCell('cell-s8-5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s8-5"></div>
       </div>
@@ -3833,6 +3907,7 @@ plt.show()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s8-6')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="fast_window, slow_window = 50, 200
 
 ema = meta.loc[&#x27;2020&#x27;:].copy()
@@ -3945,6 +4020,7 @@ print('\nBest combination is the top row — but see the warning above about pic
           <button class="run-btn" onclick="runCell('cell-s9-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -3992,6 +4068,7 @@ df.head()</pre></div>
           <button class="run-btn" onclick="runCell('cell-s9-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s9-2"></div>
       </div>
@@ -4042,6 +4119,7 @@ print(f'Annualised volatility: {annualised_volatility:.2%}')</pre></div>
           <button class="run-btn" onclick="runCell('cell-s9-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s9-3"></div>
       </div>
@@ -4086,6 +4164,7 @@ print('\nNote the portfolio volatility is below most individual stocks — that 
           <button class="run-btn" onclick="runCell('cell-s9-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s9-4"></div>
       </div>
@@ -4133,6 +4212,7 @@ print(f'Versus 1/N:     {sharpe_ratio:.3f}')</pre></div>
           <button class="run-btn" onclick="runCell('cell-s9-5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s9-5"></div>
       </div>
@@ -4168,6 +4248,7 @@ for name, r in [('1/N', init_portfolio_returns), ('Optimised', opt_portfolio_ret
           <button class="run-btn" onclick="runCell('cell-s9-6')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s9-6"></div>
       </div>
@@ -4262,6 +4343,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-1')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-1"></div>
       </div>
@@ -4298,6 +4380,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-2')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-2"></div>
       </div>
@@ -4344,6 +4427,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-3')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-3"></div>
       </div>
@@ -4388,6 +4472,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-4')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-4"></div>
       </div>
@@ -4437,6 +4522,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-5')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-5"></div>
       </div>
@@ -4485,6 +4571,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-6')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-6"></div>
       </div>
@@ -4534,6 +4621,7 @@ print('The real test is a period it never saw — split the year and refit on th
           <button class="run-btn" onclick="runCell('cell-s10-7')">▶ Run</button>
         </div>
         <textarea class="code-input" onfocus="setActiveCell(this)" spellcheck="false"
+          autocorrect="off" autocapitalize="off" autocomplete="off" data-gramm="false"
           data-default="# YOUR CODE HERE"># YOUR CODE HERE</textarea>
         <div class="cell-output" id="output-cell-s10-7"></div>
       </div>
@@ -4583,7 +4671,7 @@ print(draft)</pre></div>
         <option value="anthropic">Claude</option>
         <option value="openai">ChatGPT (not supported in-browser)</option>
       </select>
-      <input class="api-input" type="password" id="api-key-input" placeholder="sk-ant-...">
+      <input class="api-input" type="password" id="api-key-input" placeholder="sk-ant-..." autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
     <label class="api-remember"><input type="checkbox" id="api-remember"> Remember for this tab</label>
     <button class="api-save" onclick="saveApiKey()">Connect →</button>
@@ -5439,8 +5527,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Tab' && isCell) {
     e.preventDefault();
     const s = ta.selectionStart, en = ta.selectionEnd;
-    ta.value = ta.value.substring(0, s) + '    ' + ta.value.substring(en);
-    ta.selectionStart = ta.selectionEnd = s + 4;
+    ta.setRangeText('    ', s, en, 'end');
     return;
   }
 
@@ -5454,6 +5541,12 @@ document.addEventListener('keydown', e => {
 
   if (!isCell) return;
 
+  // Leave anything involving Option/Alt/Cmd alone. On AZERTY and other non-US
+  // layouts these produce ordinary symbols, and rewriting .value underneath an
+  // in-flight composition drops characters.
+  if (e.altKey || e.metaKey || e.ctrlKey || e.isComposing || e.key === 'Dead' ||
+      e.key === 'Unidentified' || e.key.length !== 1) return;
+
   const s  = ta.selectionStart;
   const en = ta.selectionEnd;
   const nextChar = ta.value[en];
@@ -5466,15 +5559,15 @@ document.addEventListener('keydown', e => {
     if (hasSelection) {
       // Wrap selection in brackets
       const selected = ta.value.substring(s, en);
-      ta.value = ta.value.substring(0, s) + e.key + selected + close + ta.value.substring(en);
+      ta.setRangeText(e.key + selected + close, s, en, 'preserve');
       ta.selectionStart = s + 1; ta.selectionEnd = en + 1;
     } else if (!nextChar || /[\s,)\]};]/.test(nextChar)) {
       // Insert pair and place cursor inside
-      ta.value = ta.value.substring(0, s) + e.key + close + ta.value.substring(en);
+      ta.setRangeText(e.key + close, s, en, 'end');
       ta.selectionStart = ta.selectionEnd = s + 1;
     } else {
       // Just insert the opener — something meaningful is right after
-      ta.value = ta.value.substring(0, s) + e.key + ta.value.substring(en);
+      ta.setRangeText(e.key, s, en, 'end');
       ta.selectionStart = ta.selectionEnd = s + 1;
     }
     return;
@@ -5499,10 +5592,44 @@ document.addEventListener('keydown', e => {
     // Insert pair only when: no selection, next char is whitespace/end/bracket, prev char is not alphanumeric
     if (!hasSelection && (!nextChar || /[\s,)\]};]/.test(nextChar)) && (!prevChar || /[\s(,\[{=]/.test(prevChar))) {
       e.preventDefault();
-      ta.value = ta.value.substring(0, s) + e.key + e.key + ta.value.substring(en);
+      ta.setRangeText(e.key + e.key, s, en, 'end');
       ta.selectionStart = ta.selectionEnd = s + 1;
     }
     return;
+  }
+});
+
+// ── Key inspector (type /keys in any cell to toggle) ──
+let KEYLOG = false;
+function toggleKeyLog() {
+  KEYLOG = !KEYLOG;
+  const el = document.getElementById('keylog');
+  if (el) el.style.display = KEYLOG ? 'block' : 'none';
+  if (KEYLOG && !el) {
+    const d = document.createElement('div');
+    d.id = 'keylog';
+    d.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;background:#0D1117;' +
+      'border:1px solid #30363D;border-radius:8px;padding:10px 12px;font:11px/1.6 monospace;' +
+      'color:#E6EDF3;max-width:340px;max-height:210px;overflow:auto';
+    d.innerHTML = '<b>Key inspector</b> — type, then send me what appears.<br>' +
+                  '<span style="color:#8B949E">Type /keys again to close.</span><hr style="border-color:#30363D">';
+    document.body.appendChild(d);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (!KEYLOG) return;
+  const el = document.getElementById('keylog');
+  if (!el) return;
+  const line = document.createElement('div');
+  line.textContent = `key=${JSON.stringify(e.key)} code=${e.code} ` +
+    `alt=${e.altKey?1:0} shift=${e.shiftKey?1:0} meta=${e.metaKey?1:0} comp=${e.isComposing?1:0}`;
+  el.appendChild(line); el.scrollTop = el.scrollHeight;
+}, true);
+document.addEventListener('input', e => {
+  if (e.target.classList && e.target.classList.contains('code-input') &&
+      e.target.value.includes('/keys')) {
+    e.target.value = e.target.value.replace('/keys', '');
+    toggleKeyLog();
   }
 });
 
