@@ -603,7 +603,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-14 15:35 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 10:29 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -1624,10 +1624,10 @@ print(f'Duplicates: {df.index.duplicated().sum()}')
     <h2>🩹 Handling Missing Values</h2>
     <div class="concept-box">
       <p>Different columns need different fill strategies depending on what the value means:</p>
-      <p>• <strong>Close</strong> → <code>ffill().bfill()</code>: <strong>forward fill</strong> uses the last known value (yesterday's close). <strong>backward fill</strong> is chained after as a safety net — if the very first row is NaN, ffill has nothing to pull from, so bfill grabs the next known value instead.<br>
-      • <strong>Volume</strong> → <code>fillna(df["Volume"].median())</code>: replace missing volume with the median (middle value) of all volumes. Median is safer than mean here because volume has spikes that would skew the average.<br>
-      • <strong>Open</strong> → <code>interpolate(method='linear')</code>: estimates the missing value as a straight line between the values before and after it. For example, if Open was 100 on Monday and 106 on Wednesday, the missing Tuesday gets 103.<br>
-      • <strong>High</strong> → <code>df[["Close","Open"]].max(axis=1)</code>: <code>axis=1</code> means "take the max across columns" (left to right) rather than down rows. This gives the higher of the two prices for each row individually — High must be at least the highest price seen that day.<br>
+      <p>• <strong>Close</strong> → <code>ffill().bfill()</code> — <strong>forward fill</strong> uses the last known value (yesterday's close). <strong>backward fill</strong> is chained after as a safety net — if the very first row is NaN, ffill has nothing to pull from, so bfill grabs the next known value instead.<br>
+      • <strong>Volume</strong> → <code>fillna(df["Volume"].median())</code> — replace missing volume with the median (middle value) of all volumes. Median is safer than mean here because volume has spikes that would skew the average.<br>
+      • <strong>Open</strong> → <code>interpolate(method='linear')</code> — estimates the missing value as a straight line between the values before and after it. For example, if Open was 100 on Monday and 106 on Wednesday, the missing Tuesday gets 103.<br>
+      • <strong>High</strong> → <code>df[["Close","Open"]].max(axis=1)</code> — the argument <code>axis=1</code> makes <code>max()</code> run <em>across</em> each row, comparing that day's Open against that day's Close, instead of running down a whole column. You get one value per day. It has to be the max of the two because the High is the highest price traded that day, and both the Open and the Close traded that day — so the High can never be below either of them.<br>
       • <strong>Low</strong> → <code>High * 0.97</code>: a simple approximation — if we have no Low data, assume it was 3% below High. This is a reasonable stand-in for a missing value.</p>
     </div>
 
@@ -5787,7 +5787,7 @@ async function runWatchCheck(afterRun) {
 }
 
 // Build check — catches a stale cached copy before it wastes anyone's afternoon
-console.log('%c Finance Python — build 2026-09-14 15:35 UTC ', 'background:#5B4CF5;color:#fff;padding:2px 6px;border-radius:3px');
+console.log('%c Finance Python — build 2026-09-14 15:24 UTC ', 'background:#5B4CF5;color:#fff;padding:2px 6px;border-radius:3px');
 (function(){
   const src = callAnthropic.toString();
   if (src.includes('browser-ipc')) {
