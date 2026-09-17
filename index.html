@@ -620,7 +620,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 15:05 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 15:18 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -5697,11 +5697,16 @@ document.addEventListener('keydown', e => {
 
   if (!isCell) return;
 
-  // Leave anything involving Option/Alt/Cmd alone. On AZERTY and other non-US
-  // layouts these produce ordinary symbols, and rewriting .value underneath an
-  // in-flight composition drops characters.
-  if (e.altKey || e.metaKey || e.ctrlKey || e.isComposing || e.key === 'Dead' ||
+  // Bail on real keyboard shortcuts (Cmd/Ctrl) and on dead-key composition.
+  // Option/Alt is deliberately NOT a bail: on AZERTY and other non-US layouts the
+  // brackets themselves need Option, so bailing would disable auto-closing entirely.
+  if (e.metaKey || e.ctrlKey || e.isComposing || e.key === 'Dead' ||
       e.key === 'Unidentified' || e.key.length !== 1) return;
+
+  // With Option held, only act on characters we actually auto-close. Everything else
+  // an Option combo produces is left completely alone.
+  if (e.altKey && BRACKET_PAIRS[e.key] === undefined &&
+      !CLOSERS.has(e.key) && !QUOTE_CHARS.has(e.key)) return;
 
   const s  = ta.selectionStart;
   const en = ta.selectionEnd;
