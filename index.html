@@ -620,7 +620,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 15:18 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 16:21 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -5696,6 +5696,45 @@ document.addEventListener('keydown', e => {
   }
 
   if (!isCell) return;
+
+  // ── Enter: keep the indentation, and open a block when the line invites one ──
+  if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const s = ta.selectionStart, en = ta.selectionEnd;
+    const before = ta.value.slice(0, s);
+    const line = before.slice(before.lastIndexOf('\n') + 1);
+    const indent = (line.match(/^[ \t]*/) || [''])[0];
+    const opensBlock = /[:([{]\s*$/.test(line);          // ends with : ( [ or {
+    const prevCh = ta.value[s - 1], nextCh = ta.value[en];
+
+    // sitting exactly between a matching pair -> closer goes to its own line
+    if (BRACKET_PAIRS[prevCh] && BRACKET_PAIRS[prevCh] === nextCh) {
+      e.preventDefault();
+      const inner = '\n' + indent + '    ';
+      ta.setRangeText(inner + '\n' + indent, s, en, 'end');
+      ta.selectionStart = ta.selectionEnd = s + inner.length;
+      return;
+    }
+    if (indent || opensBlock) {
+      e.preventDefault();
+      const ins = '\n' + indent + (opensBlock ? '    ' : '');
+      ta.setRangeText(ins, s, en, 'end');
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+      return;
+    }
+    return;   // plain Enter at column 0 — let the browser handle it
+  }
+
+  // ── Backspace: remove a whole 4-space indent level, not one space ──
+  if (e.key === 'Backspace' && ta.selectionStart === ta.selectionEnd) {
+    const s = ta.selectionStart;
+    const before = ta.value.slice(0, s);
+    const line = before.slice(before.lastIndexOf('\n') + 1);
+    if (line.length >= 4 && /^[ ]+$/.test(line) && line.length % 4 === 0) {
+      e.preventDefault();
+      ta.setRangeText('', s - 4, s, 'end');
+      return;
+    }
+  }
 
   // Bail on real keyboard shortcuts (Cmd/Ctrl) and on dead-key composition.
   // Option/Alt is deliberately NOT a bail: on AZERTY and other non-US layouts the
