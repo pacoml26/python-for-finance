@@ -620,7 +620,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 15:02 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 15:05 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -3327,7 +3327,17 @@ print((monthly_ret.max() * 100).round(1).sort_values(ascending=False).head())</p
     <div class="concept-box">
       <p><strong>seaborn</strong> (imported as <code>sns</code>) sits on top of matplotlib and gives you statistical charts in one line. It loads the first time you run a cell that mentions it, so expect a short pause on that cell only.</p>
       <p>Correlate <strong>returns, never prices</strong>. Two stocks that both drifted upward all year will show a price correlation near 1 even if their day-to-day behaviour is unrelated — the shared trend swamps everything. Returns strip that out and leave the co-movement you actually care about.</p>
-      <p>So the pipeline is always: pivot to wide, <code>.pct_change()</code> to returns, <code>.dropna()</code> to drop the first empty row, then <code>.corr()</code> for the matrix. Values run from +1 (move together) through 0 (unrelated) to −1 (move oppositely).</p>
+      <p>So the pipeline is always: pivot to wide, <code>.pct_change()</code> to returns, <code>.dropna()</code> to drop the first empty row, then <code>.corr()</code> for the matrix.</p>
+      <p><strong>What a correlation number actually means.</strong> It measures whether two things tend to move on the same days, on a scale from −1 to +1.</p>
+      <table class="coltable">
+        <tr><td>+1.0</td><td>perfect lockstep — whenever one rises, the other rises</td></tr>
+        <tr><td>+0.7</td><td>strong: they usually move together, with exceptions</td></tr>
+        <tr><td>+0.2</td><td>weak: a faint tendency, mostly unrelated</td></tr>
+        <tr><td>0.0</td><td>no relationship at all — knowing one tells you nothing about the other</td></tr>
+        <tr><td>−0.5</td><td>they tend to move in <em>opposite</em> directions</td></tr>
+      </table>
+      <p>On daily stock returns, anything above roughly 0.6 is a strong relationship. You will not see 0.95 between two different companies — daily moves are far too noisy for that, and expecting textbook numbers here is a misreading of the data rather than a failure of your code.</p>
+      <p><strong>Why it is useful:</strong> two stocks that always move together give you no protection by holding both. Holding things that <em>don't</em> move together is what diversification means, and Session 9 builds on exactly that.</p>
     </div>
 
     <div class="exercise-block">
@@ -3440,10 +3450,13 @@ plt.tight_layout()</pre></div>
         <div class="solution-body"><pre>import numpy as np
 
 c = returns_matrix.corr()
+
+# The diagonal of a correlation matrix is always 1.00 — every stock against itself.
+# Those are not interesting, so we blank them before ranking.
+# np.eye(n) builds a grid with True down the diagonal and False everywhere else;
+# ~ flips it, and .where() keeps only the cells that are True after flipping.
 pairs = c.where(~np.eye(len(c), dtype=bool)).stack()
-# np.eye() is an identity matrix — True down the diagonal
-# ~ inverts it, .where() blanks the diagonal so a stock cannot pair with itself
-# .stack() collapses the grid into one long Series indexed by (stock A, stock B)
+# .stack() then flattens the grid into one long list, labelled by (stock A, stock B)
 
 print('Most correlated pairs:')
 print(pairs.sort_values(ascending=False).head(6).round(3))
@@ -3494,8 +3507,8 @@ fig.subplots_adjust(wspace=0.3)                     # wspace = horizontal gap, a
 sns.regplot(x=returns_matrix.MSFT, y=returns_matrix.GOOGL, ax=ax1)
 # ax=ax1 sends this chart to the left panel; without it both would land on top of each other
 ax1.set_title('Strong Regression')
-ax1.set_xlabel('MSFT')                              # on an axis object it is set_xlabel, not plt.xlabel
-ax1.set_ylabel('GOOGL')
+ax1.set_xlabel('MSFT')                              # on an axis object the names gain a set_ prefix:
+ax1.set_ylabel('GOOGL')                             # set_title / set_xlabel / set_ylabel, not plt.title etc.
 
 # And on the second
 sns.regplot(x=returns_matrix.META, y=returns_matrix.NVDA, ax=ax2)
@@ -3528,7 +3541,8 @@ plt.show()</pre></div>
       </div>
       <details class="solution">
         <summary>Show Solution</summary>
-        <div class="solution-body"><pre>cum = (1 + returns_matrix).cumprod() - 1            # compound each column into a cumulative return
+        <div class="solution-body"><pre>cum = (1 + returns_matrix).cumprod() - 1            # cumprod = running product, so this compounds each
+                                                    # column day by day into a cumulative return
 
 plt.figure(figsize=(11, 5))
 for tic in cum.columns:
@@ -3537,12 +3551,14 @@ for tic in cum.columns:
 
 plt.title('2025 cumulative return by stock')
 plt.ylabel('Return (%)')
-plt.axhline(0, color='black', linewidth=0.8)        # a flat reference line at break-even
+plt.axhline(0, color='black', linewidth=0.8)        # axhline draws a horizontal line across the chart;
+                                                    # at y=0 it marks break-even
 plt.legend(ncol=4, fontsize=8)                      # ncol spreads 20 entries over 4 columns
 plt.tight_layout()
 
 print('Final ranking:')
-print((cum.iloc[-1] * 100).round(1).sort_values(ascending=False).to_string())</pre></div>
+print((cum.iloc[-1] * 100).round(1).sort_values(ascending=False).to_string())
+# .to_string() prints the whole Series instead of pandas truncating it with '...'</pre></div>
       </details>
     </div>
 
@@ -3568,7 +3584,9 @@ print((cum.iloc[-1] * 100).round(1).sort_values(ascending=False).to_string())</p
     <h2>📉 Fitting an OLS Model</h2>
     <div class="concept-box">
       <p><strong>statsmodels</strong> is the library for statistical modelling, and it loads on first use like seaborn. <strong>OLS</strong> — ordinary least squares — fits the straight line minimising the squared vertical distance to every point.</p>
-      <p>The line is <code>y = α + βx</code>. Your <strong>response</strong> <code>y</code> is what you are explaining; your <strong>predictor</strong> <code>x</code> is what you are explaining it with. In <code>sm.OLS(y, X)</code> the response comes <em>first</em> — swap them and you fit a different model that answers a different question.</p>
+      <p><strong>What a regression is, plainly.</strong> You have a cloud of dots — each dot is one day, with Apple's return across the bottom and Google's up the side. A regression draws the single straight line that passes closest to all of them. That line is a summary: <em>on a day when Apple moved this much, Google typically moved that much.</em></p>
+      <p>The line is <code>y = α + βx</code>, which is just the equation of a straight line. <strong>β</strong> (beta) is the <em>slope</em> — how steep it is, so how much y moves for each unit of x. <strong>α</strong> (alpha) is the <em>intercept</em> — where the line crosses the vertical axis, i.e. what y is when x is zero.</p>
+      <p>Your <strong>response</strong> <code>y</code> is what you are explaining; your <strong>predictor</strong> <code>x</code> is what you are explaining it with. In <code>sm.OLS(y, X)</code> the response comes <em>first</em> — swap them and you fit a different model answering a different question.</p>
       <p><strong>You must call <code>sm.add_constant(X)</code>.</strong> Without it statsmodels fits <code>y = βx</code> with no intercept, forcing the line through the origin and biasing β. It is the single most common mistake with this library, and nothing warns you.</p>
       <p>Fit with <code>.fit()</code>, then read <code>.summary()</code>.</p>
     </div>
@@ -3931,6 +3949,9 @@ for tic, g in panel.set_index('datadate').groupby('tic'):
     rows.append(g)
 
 allstocks = pd.concat(rows)
+# pd.concat stacks a list of DataFrames into one. Note: this is NOT used anywhere in your
+# course notebooks — if you prefer to stay inside the course's own vocabulary, build the
+# summary with a plain loop and a dict instead.
 result = allstocks.groupby('tic').agg({'Market': 'last', 'Strategy': 'last'})
 # 'last' takes the end-of-period value of each cumulative column
 result['Beat market?'] = result['Strategy'] &gt; result['Market']
@@ -4054,7 +4075,7 @@ ema['FastEMA'] = ema['prccd'].ewm(span=fast_window, adjust=False).mean()
 ema['SlowEMA'] = ema['prccd'].ewm(span=slow_window, adjust=False).mean()
 
 ema['Signal'] = np.where(ema['FastEMA'] &gt; ema['SlowEMA'], 1, -1)
-ema['Signal'] = np.where(ema['SlowEMA'].isna(), 0, ema['Signal'])
+ema['Signal'] = np.where(ema['SlowEMA'].isna(), 0, ema['Signal'])   # .isna() is the same test as .isnull()
 
 ema['Position'] = ema['Signal'].shift()
 ema['StratRet'] = ema['Position'] * ema['MarketDaily']
@@ -4124,8 +4145,17 @@ print('\nBest combination is the top row — but see the warning above about pic
   <div class="lesson" id="s9-form">
     <h2>🧺 Building a Portfolio</h2>
     <div class="concept-box">
-      <p>A portfolio is several securities held together, each with a <strong>weight</strong> — the share of your money in it. Weights sum to 1. A <strong>1/N</strong> or equal-weighted portfolio simply splits the money evenly, and it is a much harder benchmark to beat than it looks.</p>
-      <p>The portfolio return on any day is the weighted average of the individual returns. <code>returns.dot(weights)</code> does that in one step: the dot product multiplies each stock's return by its weight and sums across the row, giving one portfolio return per day.</p>
+      <p><strong>A portfolio is just "I own several things at once".</strong> A <strong>weight</strong> is the fraction of your money in each one. Put £10,000 into five stocks evenly and each weight is 0.2 — twenty percent each. Weights always add up to 1, because they describe how you split one pot of money.</p>
+      <p><strong>1/N</strong> means exactly that even split — one divided by the number of stocks. It sounds naive, and it is famously hard to beat.</p>
+      <p><strong>Why hold several things at all?</strong> Because they do not all fall on the same days. If one stock drops 5% while another rises 2%, your portfolio loses far less than the worst holding. That is diversification, and it is the direct payoff of the low correlations you measured in Session 6.</p>
+      <p>The portfolio return on any day is the weighted average of the individual returns. <code>returns.dot(weights)</code> does that in one step: it multiplies each stock's return by its weight and adds them across the row, giving one portfolio return per day. (<code>np.array([0.2]*5)</code> just builds the list of weights in the form <code>.dot()</code> expects.)</p>
+      <p><strong>Annualising — turning daily figures into yearly ones.</strong> You will have a daily average return and a daily standard deviation, but nobody quotes those. Converting them uses two <em>different</em> rules, and mixing them up is the most common error in this session:</p>
+      <table class="coltable">
+        <tr><td>return</td><td><code>daily_mean * 252</code> — multiply by the number of trading days. Returns add up over time, so a year is 252 daily returns stacked end to end.</td></tr>
+        <tr><td>volatility</td><td><code>daily_std * np.sqrt(252)</code> — multiply by the <em>square root</em>. Risk does not add up in a straight line: gains and losses partly cancel out, so a year is only about 16 times as volatile as a day, not 252 times.</td></tr>
+      </table>
+      <p><code>np.sqrt(252)</code> is numpy's square-root function — roughly 15.87. You could equally write <code>252 ** 0.5</code>, which is the same thing in plain Python.</p>
+      <p><strong>Volatility</strong> (also called standard deviation, <code>.std()</code>) measures how much the returns bounce around. A high number means wild swings; a low one means a steady ride. It is the standard stand-in for "risk".</p>
       <p><code>.isin(list)</code> filters rows whose value appears anywhere in a list — the clean way to pull a handful of tickers out of a panel without chaining a dozen <code>|</code> conditions.</p>
     </div>
 
@@ -4173,6 +4203,7 @@ df = data[data['tic'].isin(tickers)]
 # .isin() tests membership of a list — far cleaner than tic=='TSLA' | tic=='MSFT' | ...
 
 print('Rows:', len(df), '| tickers:', sorted(df['tic'].unique()))
+# .unique() lists the distinct values; .nunique() would just count them
 df.head()</pre></div>
       </details>
     </div>
@@ -4223,7 +4254,9 @@ print(f'Annualised volatility: {annualised_volatility:.2%}')</pre></div>
   <div class="lesson" id="s9-sharpe">
     <h2>⚖️ The Sharpe Ratio</h2>
     <div class="concept-box">
-      <p>Return alone is not a result — you can always get more of it by taking more risk. The <strong>Sharpe ratio</strong> asks how much excess return you earned per unit of volatility:</p>
+      <p>Return alone is not a result — you can always get more of it by taking more risk. Doubling your risk to double your return has achieved nothing.</p>
+      <p>The <strong>Sharpe ratio</strong> is the fix: <em>how much return did you earn for each unit of risk you took?</em> Higher is better. It lets you compare a calm portfolio returning 8% against a wild one returning 20% and say which was actually run better.</p>
+      <p>The <strong>risk-free rate</strong> is what you could earn with no risk at all — government bonds, roughly. It is subtracted because that portion was free; only what you earned <em>above</em> it was payment for taking risk.</p>
       <p><code>Sharpe = (Rp − Rf) / σp</code>, where <code>Rp</code> is the annualised portfolio return, <code>Rf</code> the risk-free rate, and <code>σp</code> the annualised volatility.</p>
       <p>Subtracting <code>Rf</code> matters: a portfolio returning 4% when Treasury bills pay 4.5% has earned <em>nothing</em> for the risk it took, and its Sharpe is negative. Loosely, above 1 is good, above 2 is very good, and anything above 3 on a backtest is usually a bug, a look-ahead leak, or a period too short to mean anything.</p>
     </div>
@@ -4345,7 +4378,7 @@ print(f'Versus 1/N:     {sharpe_ratio:.3f}')</pre></div>
 opt_portfolio_std_dev = opt_portfolio_returns.std()
 
 annualised_return = opt_portfolio_returns.mean() * 252
-annualised_volatility = opt_portfolio_std_dev * np.sqrt(252)
+annualised_volatility = opt_portfolio_std_dev * np.sqrt(252)   # sqrt for risk, *252 for return
 
 print("Annualised portfolio returns, volatility", annualised_return, annualised_volatility)
 
