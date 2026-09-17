@@ -268,6 +268,23 @@ header .spacer { flex: 1; }
   text-transform: uppercase; color: var(--accent); opacity: .75; margin-bottom: 5px;
 }
 
+
+/* ── worked example: input → output ── */
+.worked {
+  background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 8px; padding: 12px 14px; margin: 12px 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--code-text); overflow-x: auto; line-height: 1.5;
+}
+.worked .wl { color: var(--text3); font-family: 'Inter', sans-serif; font-size: 11px;
+  text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 6px; }
+.worked .wl + pre { margin-bottom: 14px; }
+.worked pre:last-child { margin-bottom: 0; }
+.worked .arrow { color: var(--accent); font-weight: 600; }
+.coltable { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+.coltable td { padding: 4px 10px 4px 0; vertical-align: top; border-bottom: 1px solid var(--border); }
+.coltable td:first-child { font-family: 'JetBrains Mono', monospace; color: #79C0FF; white-space: nowrap; width: 90px; }
+
 /* ── Code Cell ── */
 .cell {
   border: 1px solid var(--code-border); border-radius: 10px;
@@ -603,7 +620,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-16 23:38 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 15:02 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -2875,9 +2892,20 @@ print(f'Annualised vol:    {returns.std() * (252 ** 0.5):.1%}')
   <div class="lesson" id="s5-intro">
     <h2>🗃 What Panel Data Looks Like</h2>
     <div class="concept-box">
-      <p><strong>Panel data</strong> tracks many entities over many dates. Stored <em>long</em>, each row is one stock on one day, so a ticker column tells you which stock each row belongs to. 20 stocks × 250 days is 5,000 rows, not a 250×20 grid.</p>
-      <p>This file comes from <strong>Compustat</strong> via WRDS, which your Imperial login gives you access to. Its column names are terse and worth learning, because you will meet them again: <code>datadate</code> the date, <code>tic</code> the ticker, <code>conm</code> the company name, <code>exchg</code> the exchange code (11 = NYSE, 14 = NASDAQ), <code>prcod</code> / <code>prchd</code> / <code>prcld</code> / <code>prccd</code> the open, high, low and close, and <code>cshtrd</code> the shares traded.</p>
-      <p>Long format is what <code>groupby</code> is built for. Wide format — dates down, tickers across — is what correlation and portfolio maths need. You will move between the two constantly.</p>
+      <p>Every file so far held <strong>one company</strong>. This one holds twenty, stacked on top of each other. Each row is <strong>one company on one day</strong>, so the file is 20 companies × 261 trading days = 5,220 rows. There is a column telling you which company each row belongs to — without it you could not tell the rows apart.</p>
+      <p>The column names come from <strong>Compustat</strong>, a financial database your Imperial login gives you access to. They are abbreviations and they are not meant to be readable, so here is what each one is:</p>
+      <table class="coltable">
+        <tr><td>datadate</td><td>the date</td></tr>
+        <tr><td>tic</td><td><strong>ticker</strong> — the short code for a company. <code>AAPL</code> is Apple, <code>WMT</code> is Walmart. Every company has exactly one.</td></tr>
+        <tr><td>conm</td><td>the company's full name, e.g. <code>APPLE INC</code>. Same information as <code>tic</code>, just longer.</td></tr>
+        <tr><td>exchg</td><td>which <strong>exchange</strong> — the marketplace where the shares are bought and sold. Your file has two: <code>11</code> is the New York Stock Exchange, <code>14</code> is NASDAQ.</td></tr>
+        <tr><td>prcod</td><td>the price when trading <strong>opened</strong> that day</td></tr>
+        <tr><td>prchd</td><td>the <strong>highest</strong> price reached that day</td></tr>
+        <tr><td>prcld</td><td>the <strong>lowest</strong> price that day</td></tr>
+        <tr><td>prccd</td><td>the price when trading <strong>closed</strong> that day — the one people usually mean by "the price"</td></tr>
+        <tr><td>cshtrd</td><td>how many <strong>shares</strong> were bought and sold that day</td></tr>
+      </table>
+      <p>This shape — one row per thing per date — is called <strong>long format</strong>, and it is what <code>groupby</code> is built for. Later you will flip it into <strong>wide format</strong>, with dates down the side and one column per company, which is what charts and correlations need.</p>
     </div>
 
     <div class="exercise-block">
@@ -2922,9 +2950,73 @@ df.head()</pre></div>
   <div class="lesson" id="s5-groupby">
     <h2>🧮 Grouping and Aggregating</h2>
     <div class="concept-box">
-      <p><code>groupby</code> is the workhorse of panel analysis. <code>df.groupby("tic")["cshtrd"].sum()</code> reads left to right as: split the rows into one group per ticker, take the <code>cshtrd</code> column, and total it within each group. You get one row back per group.</p>
-      <p>The aggregation on the end decides what you get: <code>.sum()</code> totals, <code>.mean()</code> averages, <code>.nunique()</code> counts distinct values, <code>.size()</code> counts rows, and <code>.first()</code> / <code>.last()</code> take the earliest or latest row in each group.</p>
-      <p>Group by a <strong>list</strong> of columns to split on several keys at once. Chain <code>.nlargest(n)</code> to keep only the top n results, which saves sorting and slicing by hand.</p>
+      <p><strong>The whole idea in one line: sort the rows into piles, then turn each pile into a single number.</strong> That is all <code>groupby</code> does. If you have used a pivot table in Excel, this is the same operation.</p>
+      <p>Why you need it: 5,220 rows is the wrong level for any real question. Nobody asks "what was Apple's volume on 14 March". They ask "how much does each company trade in a year" — which means taking thousands of rows and producing one number per company.</p>
+
+      <div class="worked">
+        <span class="wl">Start with a small table</span>
+<pre> tic    day   cshtrd
+AAPL   Mon      100
+MSFT   Mon       60
+AAPL   Tue      120
+MSFT   Tue       80
+AAPL   Wed       90
+MSFT   Wed       70</pre>
+        <span class="wl">df.groupby("tic") — sort into piles by company</span>
+<pre>pile "AAPL":  100, 120, 90        pile "MSFT":  60, 80, 70</pre>
+        <span class="wl">["cshtrd"].sum() — add up each pile <span class="arrow">→</span> one row out per pile</span>
+<pre>tic
+AAPL    310
+MSFT    210</pre>
+      </div>
+
+      <p>Read the code left to right — it is three decisions in order:</p>
+      <p><code>df.groupby("tic")</code> <strong>what makes a pile</strong> &nbsp;·&nbsp; <code>["cshtrd"]</code> <strong>which column to measure</strong> &nbsp;·&nbsp; <code>.sum()</code> <strong>how to squash each pile into one number</strong></p>
+
+      <p><strong>The choices for that last step:</strong></p>
+      <table class="coltable">
+        <tr><td>.sum()</td><td>adds the values up. Right for volume — shares genuinely add together.</td></tr>
+        <tr><td>.mean()</td><td>the average. Right for prices — adding up every closing price a stock had would be a meaningless number.</td></tr>
+        <tr><td>.max() .min()</td><td>the biggest / smallest value in the pile</td></tr>
+        <tr><td>.first() .last()</td><td>the earliest / latest row in the pile. Useful for "price at the start of the year" and "price at the end".</td></tr>
+        <tr><td>.size()</td><td>how many <em>rows</em> are in the pile. Needs no column — you are counting, not measuring.</td></tr>
+        <tr><td>.nunique()</td><td>how many <strong>different</strong> values. <code>[Apple, Apple, Tesla]</code> has 3 rows but 2 distinct values.</td></tr>
+      </table>
+
+      <div class="tip-box" style="margin:14px 0">
+        <span class="tip-icon">⚠️</span>
+        <div><strong>The one that catches everyone.</strong> Grouping by exchange and asking for tickers: <code>.nunique()</code> gives <strong>8 and 12</strong> — how many different companies. <code>.count()</code> gives <strong>2,088 and 3,132</strong> — how many rows, which is really the number of trading days. Both look like plausible answers. Only one answers the question.</div>
+      </div>
+
+      <p><strong>Grouping by more than one thing.</strong> Pass a list and you get a pile for every combination: <code>df.groupby(["tic", "month"])</code> makes one pile per company per month. Twenty companies over twelve months is up to 240 piles.</p>
+      <p>A column you group by comes back <em>as a column</em> in the result. So if a piece of information never varies within a pile — a company's full name, say — adding it to the group list is a free way to carry it into the output. <code>groupby(["conm","tic","month"])</code> makes exactly the same piles as <code>groupby(["tic","month"])</code>, but the answer table shows the full company name too.</p>
+
+      <p><strong><code>.agg()</code> — different treatment for different columns.</strong> Everything above applies one operation to one column. Sometimes you want several at once: for each company, keep its name, take its <em>first</em> opening price, and take its <em>last</em> closing price. Three columns, three different operations, one pass.</p>
+      <p>You describe that with a <strong>dictionary</strong> — the <code>{ }</code> brackets — where each entry says <em>column : what to do with it</em>:</p>
+
+      <div class="worked">
+        <span class="wl">the code</span>
+<pre>df.groupby("tic").agg({
+    "conm":  "first",   &lt;- keep the company name (it never changes, so "first" just carries it through)
+    "prcod": "first",   &lt;- the first OPENING price of the period
+    "prccd": "last"     &lt;- the last CLOSING price of the period
+})</pre>
+        <span class="wl">what comes out — one row per company</span>
+<pre>tic           conm     prcod    prccd
+AAPL     APPLE INC    290.86   255.00
+AZO   AUTOZONE INC   3027.91  3600.00</pre>
+      </div>
+      <p>Note the operations are written as <strong>strings in quotes</strong> here — <code>"first"</code>, not <code>.first()</code>. Inside <code>.agg()</code> you are naming the operation, not calling it.</p>
+
+      <p><strong>Three small helpers you will see in the solutions:</strong></p>
+      <table class="coltable">
+        <tr><td>.nlargest(3)</td><td>keep only the three biggest values of a result. Shorter than sorting then slicing.</td></tr>
+        <tr><td>.rename("x")</td><td>gives the answer column a readable name instead of a blank one</td></tr>
+        <tr><td>.reset_index()</td><td>after grouping, the things you grouped by become the row labels. This pushes them back into ordinary columns, which makes the table easier to read and print.</td></tr>
+      </table>
+
+      <p><strong>Filter before you group.</strong> If a question only concerns some rows — "days where the price was above $1000" — narrow the data first with a mask, then group what remains: <code>df[df["prccd"] &gt; 1000].groupby(...)</code>. Grouping first and filtering after answers a different question.</p>
+      <p>One more: <code>df["datadate"].dt.day_name()</code> turns a date into <code>"Monday"</code>. The <code>.dt</code> is needed because <code>datadate</code> is a <em>column</em> — it is the doorway to date-specific tools. If the date is the <em>index</em> instead, you write <code>df.index.day_name()</code> with no <code>.dt</code>. Both appear in your course. It only works once <code>pd.to_datetime()</code> has run; on plain text you get an error about <code>.dt</code> not existing.</p>
     </div>
 
     <div class="exercise-block">
@@ -3081,9 +3173,38 @@ aggregated.sort_values('diff', ascending=False)</pre></div>
   <div class="lesson" id="s5-reshape">
     <h2>🔄 Reshaping: Long ↔ Wide</h2>
     <div class="concept-box">
-      <p><code>pivot()</code> turns long into wide. You tell it three things: <code>index</code> — what goes down the side, <code>columns</code> — what spreads across the top, and <code>values</code> — what fills the grid. <code>df.pivot(index="datadate", columns="tic", values="prccd")</code> gives dates down, tickers across, closing prices inside. That is the shape correlation matrices and portfolio weights need.</p>
-      <p><code>resample()</code> changes the <em>frequency</em> of a datetime index. <code>"D"</code> is calendar days, <code>"W"</code> weeks, <code>"ME"</code> month-end, <code>"QE"</code> quarter-end. It needs to know how to combine the rows it merges: <code>.mean()</code>, <code>.sum()</code>, <code>.last()</code>, or <code>.asfreq()</code> to take the value as-is without aggregating.</p>
-      <p>Resampling <em>up</em> to a finer frequency creates rows that never existed. Markets do not trade at weekends, so <code>resample("D")</code> invents Saturdays and Sundays and fills them with <code>NaN</code> — which is a question about your data, not a bug to paper over.</p>
+      <p>Grouping <em>summarises</em> the rows. Reshaping <em>rearranges</em> them — same data, different layout, nothing lost.</p>
+      <p><strong><code>pivot()</code> turns long into wide.</strong> Long format stacks every company on top of each other in one tall column. Wide format spreads them out: dates down the side, one column per company. That is the layout a chart needs, because matplotlib draws one line per column.</p>
+
+      <div class="worked">
+        <span class="wl">long — 6 rows, company named in a column</span>
+<pre>  datadate   tic   prccd
+2025-01-02  AAPL   281.0
+2025-01-02  MSFT   420.0
+2025-01-03  AAPL   282.0
+2025-01-03  MSFT   418.0
+2025-01-06  AAPL   285.0
+2025-01-06  MSFT   425.0</pre>
+        <span class="wl">df.pivot(index="datadate", columns="tic", values="prccd") <span class="arrow">→</span> wide, 3 rows</span>
+<pre>tic          AAPL    MSFT
+datadate
+2025-01-02  281.0   420.0
+2025-01-03  282.0   418.0
+2025-01-06  285.0   425.0</pre>
+      </div>
+
+      <p>Three arguments, and the names say what they do: <code>index</code> is what runs down the side, <code>columns</code> is what spreads across the top, <code>values</code> is what fills the grid. Your 5,220-row file becomes a 261 × 20 table.</p>
+      <p>Once wide, ordinary operations work column by column. <code>volume.sum()</code> totals each column, giving one figure per company. <code>prices.pct_change()</code> gives daily returns for all twenty at once.</p>
+
+      <p><strong><code>resample()</code> changes the time frequency.</strong> Daily data is noisy; often you want monthly. Resampling groups the rows by time period — it is <code>groupby</code> for dates, so it needs the same thing on the end: how to combine the rows it merges.</p>
+      <table class="coltable">
+        <tr><td>"D"</td><td>calendar days</td></tr>
+        <tr><td>"W"</td><td>weeks</td></tr>
+        <tr><td>"ME"</td><td>month end</td></tr>
+        <tr><td>"QE"</td><td>quarter end</td></tr>
+      </table>
+      <p>Then <code>.mean()</code> to average the period, <code>.sum()</code> to total it, <code>.last()</code> to take the final value, or <code>.asfreq()</code> to take values as they are without combining anything.</p>
+      <p><strong>Resampling to a <em>finer</em> frequency invents rows.</strong> Markets are shut at weekends, so there is no Saturday data. Ask for calendar days and pandas creates those rows anyway and fills them with <code>NaN</code>. That is not a bug to paper over — it is a question about your data. Filling weekend <em>volume</em> with 0 is honest, because no shares really did trade. Filling a weekend <em>price</em> with 0 would be a lie that shows up later as a −100% return.</p>
     </div>
 
     <div class="exercise-block">
@@ -5980,11 +6101,12 @@ THE DATASETS. These are the ONLY files that exist. Never invent a filename, neve
   data/AAPL_2026_raw.csv      Sessions 2a and 3. MESSY Apple Jan-Jun 2026, plus Dividends and Stock Splits. Dates are DD/MM/YYYY so this one needs dayfirst=True.
   data/MCD_2025_raw.csv       Session 2b, and the same for SBUX, CMG, DPZ, WEN. Messy 2025 restaurant stocks, ISO dates.
   data/NVDA_2025.csv          Session 4. Clean, Date,Open,High,Low,Close,Volume.
-  data/SP500_2025.csv         Sessions 5, 6, 9. Compustat panel, 2025 only: datadate,tic,conm,exchg,prcod,prchd,prcld,prccd,cshtrd. Dates DD/MM/YYYY.
-  data/SP500_panel.csv        Session 8. Same columns, 2019-2025, for long moving averages.
+  data/SP500_2025.csv         Sessions 5, 6, 9. Compustat panel, 2025 only: datadate,tic,conm,exchg,prcod,prchd,prcld,prccd,cshtrd. ISO dates — do NOT pass dayfirst.
+  data/SP500_panel.csv        Session 8. Same columns, 2019-2025, ISO dates.
   data/trading_data.csv       Session 7. Date, AAPL.Close, GOOG.Close.
   data/NUMA_2023_2026_raw.csv Session 10 assessment. Messy, ISO dates.
   data/SEMI_2023_2026.csv     Session 10 panel. Compustat columns, DD/MM/YYYY.
+ONLY data/AAPL_2026_raw.csv and data/SEMI_2023_2026.csv use DD/MM/YYYY and need dayfirst=True. Every other file is ISO — passing dayfirst there causes a confusing ValueError about unconverted data.
 If a cell raises FileNotFoundError, the cause is almost always a mistyped name — compare what they wrote against this list and tell them the correct one. The course files are always prefixed data/.
 
 THE COURSE. Ten sessions: 1 time series basics, 2a cleaning, 2b the restaurant group exercise, 3 returns and NumPy, 4 matplotlib, 5 panel data and reshaping, 6 seaborn and correlation, 7 OLS regression, 8 trading strategies, 9 portfolios. Session 10 is assessment practice. Sessions 1-9 are ordinary teaching exercises with a Show Solution button, so you may be more direct there than on the assessment.
