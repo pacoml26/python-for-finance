@@ -620,7 +620,7 @@ body.resizing #ai-panel { transition: none; }
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">Loading Python…</span>
   </div>
-  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-17 16:21 UTC</span>
+  <span class="build-stamp" title="If this is older than the last push, your browser is serving a cached copy — hard-refresh with Cmd+Shift+R">build 2026-09-18 10:53 UTC</span>
   <button class="hdr-btn" onclick="toggleTheme()">🌗 Theme</button>
   <button class="hdr-btn active" id="ai-hdr-btn" onclick="toggleAI()">🤖 AI Tutor</button>
 </header>
@@ -5347,23 +5347,22 @@ _old_err = sys.stderr
 sys.stdout = _buf
 sys.stderr = _buf
 try:
-    _lines = str(_USER_CODE).rstrip().split('\\n')
+    _src = str(_USER_CODE).rstrip()
+    _lines = _src.split('\\n')
+    _body = _src
     _last = ''
-    _last_idx = len(_lines)
-    for _i in range(len(_lines)-1, -1, -1):
-        _stripped = _lines[_i].strip()
-        if _stripped and not _stripped.startswith('#'):
-            _last = _stripped
-            _last_idx = _i
-            break
-    _body = '\\n'.join(_lines[:_last_idx])
     _is_expr = False
-    if _last:
-        try:
-            ast.parse(_last, mode='eval')
+    try:
+        _mod = ast.parse(_src)
+        if _mod.body and isinstance(_mod.body[-1], ast.Expr):
+            _start = _mod.body[-1].lineno - 1
+            _body = '\\n'.join(_lines[:_start])
+            _last = '\\n'.join(_lines[_start:])
             _is_expr = True
-        except SyntaxError:
-            pass
+    except SyntaxError:
+        _body = _src
+        _last = ''
+        _is_expr = False
     _g = globals()
     if _body.strip():
         exec(compile(_body, '<cell>', 'exec'), _g)
@@ -6161,7 +6160,7 @@ async function runWatchCheck(afterRun) {
 }
 
 // Build check — catches a stale cached copy before it wastes anyone's afternoon
-console.log('%c Finance Python — build 2026-09-14 15:24 UTC ', 'background:#5B4CF5;color:#fff;padding:2px 6px;border-radius:3px');
+console.log('%c Finance Python — build 2026-09-18 10:53 UTC ', 'background:#5B4CF5;color:#fff;padding:2px 6px;border-radius:3px');
 (function(){
   const src = callAnthropic.toString();
   if (src.includes('browser-ipc')) {
